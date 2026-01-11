@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { academicService } from '@/services/academic.service';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, BookOpen, Calendar, Filter } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar, Filter, Flame } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/language-context';
 import { LecturerVoteButtons } from '@/components/lecturer/lecturer-vote-buttons';
@@ -114,8 +114,24 @@ export default function LecturerDetailPage() {
             </Button>
 
             {/* Profile Header */}
-            <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-lg border border-slate-100 dark:border-slate-700 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden mb-10 transition-colors duration-300">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-bl-full -z-0 opacity-50" />
+            <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-lg border border-slate-100 dark:border-slate-700 flex flex-col md:flex-row gap-8 items-start relative overflow-visible mb-10 transition-colors duration-300">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-bl-full -z-0 opacity-50 overflow-hidden" />
+
+                {/* Hotness Indicator */}
+                <div className="absolute top-4 right-4 z-20">
+                    <div className="relative group/tooltip">
+                        <div className={`p-3 rounded-full border shadow-sm ${lecturer.engagementScore && lecturer.engagementScore > 50 ? 'bg-orange-100 text-orange-600 border-orange-200 dark:bg-orange-900/30 dark:border-orange-800' : 'bg-slate-50 text-slate-300 border-slate-100 dark:bg-slate-800 dark:border-slate-700'}`}>
+                            <Flame className={`w-8 h-8 ${lecturer.engagementScore && lecturer.engagementScore > 50 ? 'animate-pulse text-orange-600' : 'text-orange-500'}`} />
+                        </div>
+                        <div className="absolute top-full right-0 mt-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 shadow-xl z-30 pointer-events-none">
+                            <p className="font-semibold mb-1 text-orange-400 flex items-center gap-1">
+                                🔥 {t('lecturers.hot_tooltip').split(':')[0]}
+                                <span className="ml-auto bg-slate-800 px-1.5 py-0.5 rounded text-white font-mono">{lecturer.engagementScore || 0}</span>
+                            </p>
+                            {t('lecturers.hot_tooltip').split(':')[1]}
+                        </div>
+                    </div>
+                </div>
 
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-4xl shadow-xl shadow-blue-500/20 z-10 shrink-0">
                     {lecturer.fullName.charAt(0)}

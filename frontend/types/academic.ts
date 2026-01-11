@@ -13,6 +13,7 @@ export interface Lecturer {
     myVote?: 'UPVOTE' | 'DOWNVOTE' | null;
     assignmentsCount?: number;
     reviewsCount?: number;
+    engagementScore?: number;
     _count?: {
         teachingAssignments: number;
         reviews: number;

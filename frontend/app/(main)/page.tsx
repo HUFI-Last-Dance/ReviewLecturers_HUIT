@@ -112,7 +112,7 @@ export default function Home() {
 
                   <div className="relative group/tooltip">
                     <span className={`px-2 py-1 rounded-lg border flex items-center gap-1 cursor-help ${lecturer.engagementScore && lecturer.engagementScore > 50 ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800' : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'}`}>
-                      <Flame className={`w-3 h-3 ${(lecturer.engagementScore && lecturer.engagementScore > 50) ? 'animate-pulse' : ''}`} />
+                      <Flame className={`w-3 h-3 text-orange-500 ${(lecturer.engagementScore && lecturer.engagementScore > 50) ? 'animate-pulse' : ''}`} />
                       {lecturer.engagementScore || 0}
                     </span>
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 text-white text-[10px] rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 shadow-xl z-50 pointer-events-none text-center">
