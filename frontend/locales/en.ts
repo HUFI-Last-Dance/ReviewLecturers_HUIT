@@ -14,6 +14,18 @@ export const en = {
         lecturers: "Lecturers",
         about: "About"
     },
+    about: {
+        title: "About HUIT Review",
+        subtitle: "Platform for sharing teaching reviews for HUIT students.",
+        mission_title: "Mission & Goals",
+        mission_content: "HUIT Review was created to provide an objective reference channel for students of Ho Chi Minh City University of Industry and Trade. We aim to build a civilized sharing community where students can exchange learning experiences and evaluate teaching quality constructively.",
+        origin_title: "Student Project",
+        origin_content: "This is a non-profit project developed by a group of HUIT students. We understand the difficulties in course registration and wish to contribute a useful tool to the community.",
+        data_title: "Data Source",
+        data_content: "Data on lecturers and subjects is collected from public sources on the university's website. Reviews are entirely user-contributed.",
+        disclaimer_title: "Disclaimer",
+        disclaimer_content: "HUIT Review is an independent project, not under the management of the university. All reviews are personal opinions of the authors."
+    },
     home: {
         hero_title: "HUIT Lecturer Reviews",
         hero_subtitle: "Platform for sharing teaching reviews for HUIT students. Objective - Transparent - Helpful.",
@@ -83,7 +95,8 @@ export const en = {
         teaching_assignments: "Assignments",
         teaching_history_reviews: "Teaching History & Reviews",
         class: "Class",
-        view_reviews: "View reviews"
+        view_reviews: "View reviews",
+        hot_tooltip: "Hotness: Calculated based on the level of interest, interaction, and discussion from the student community."
     },
     assignment: {
         not_found: "Assignment not found",

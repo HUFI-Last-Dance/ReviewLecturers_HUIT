@@ -13,7 +13,18 @@ export const vi = {
         home: "Trang chủ",
         lecturers: "Giảng viên",
         about: "Giới thiệu"
-
+    },
+    about: {
+        title: "Về HUIT Review",
+        subtitle: "Nền tảng chia sẻ đánh giá giảng viên, môn học dành cho sinh viên HUIT.",
+        mission_title: "Mục tiêu & Sứ mệnh",
+        mission_content: "HUIT Review được tạo ra với mục đích cung cấp một kênh thông tin tham khảo khách quan cho sinh viên trường Đại học Công Thương TP.HCM. Chúng tôi mong muốn xây dựng một cộng đồng chia sẻ văn minh, nơi sinh viên có thể trao đổi kinh nghiệm học tập và đánh giá chất lượng giảng dạy một cách xây dựng.",
+        origin_title: "Dự án của sinh viên",
+        origin_content: "Đây là dự án phi lợi nhuận được phát triển bởi nhóm sinh viên HUIT. Chúng tôi thấu hiểu những khó khăn trong việc đăng ký môn học và mong muốn đóng góp một công cụ hữu ích cho cộng đồng.",
+        data_title: "Nguồn dữ liệu",
+        data_content: "Dữ liệu về giảng viên và môn học được thu thập từ các nguồn công khai trên trang web của trường. Các bài đánh giá hoàn toàn do người dùng đóng góp.",
+        disclaimer_title: "Miễn trừ trách nhiệm",
+        disclaimer_content: "HUIT Review là dự án độc lập, không trực thuộc quản lý của nhà trường. Mọi ý kiến đánh giá đều là quan điểm cá nhân của người viết."
     },
     home: {
         hero_title: "Review Giảng viên HUIT",
@@ -84,7 +95,8 @@ export const vi = {
         teaching_assignments: "Lớp học phần",
         teaching_history_reviews: "Lịch sử giảng dạy & Đánh giá",
         class: "Lớp",
-        view_reviews: "Xem reviews"
+        view_reviews: "Xem reviews",
+        hot_tooltip: "Độ Hot: Được tính toán dựa trên mức độ quan tâm, tương tác và thảo luận của cộng đồng sinh viên."
     },
     assignment: {
         not_found: "Không tìm thấy lớp học phần",

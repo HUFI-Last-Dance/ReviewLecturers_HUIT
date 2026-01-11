@@ -38,7 +38,7 @@ export function Header() {
     const navItems = [
         { label: t('nav.home'), href: '/' },
         { label: t('nav.lecturers'), href: '/lecturers' },
-        // { label: t('nav.about'), href: '/about' },
+        { label: t('nav.about'), href: '/about' },
     ];
 
     const isActive = (path: string) => pathname === path;
