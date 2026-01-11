@@ -3,7 +3,10 @@ export interface Lecturer {
     fullName: string;
     staffId?: string;
     email?: string;
-    degree?: string;
+    degree?: {
+        code: string;
+        name: string;
+    };
     avatar?: string;
     upvoteCount?: number;
     downvoteCount?: number;
