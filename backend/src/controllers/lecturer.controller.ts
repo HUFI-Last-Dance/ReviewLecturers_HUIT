@@ -212,6 +212,12 @@ export const getLecturerById = async (
                             reviews: true,
                         },
                     },
+                    reviews: {
+                        select: {
+                            upvoteCount: true,
+                            downvoteCount: true,
+                        },
+                    },
                 },
                 orderBy: {
                     createdAt: 'desc',
@@ -240,9 +246,26 @@ export const getLecturerById = async (
         }
     }
 
+    // Calculate engagement score
+    let reviewsCount = 0;
+    let totalReviewVotes = 0;
+
+    lecturer.teachingAssignments.forEach((ta: any) => {
+        reviewsCount += ta._count.reviews;
+        if (ta.reviews) {
+            ta.reviews.forEach((r: any) => {
+                totalReviewVotes += (r.upvoteCount || 0) + (r.downvoteCount || 0);
+            });
+        }
+    });
+
+    const lecturerVotes = (lecturer.upvoteCount || 0) + (lecturer.downvoteCount || 0);
+    const engagementScore = (lecturerVotes * 2) + totalReviewVotes + reviewsCount;
+
     const response = {
         ...lecturer,
         myVote,
+        engagementScore,
         teachingAssignments: lecturer.teachingAssignments.map((ta) => ({
             id: ta.id,
             classCode: ta.classCode,
