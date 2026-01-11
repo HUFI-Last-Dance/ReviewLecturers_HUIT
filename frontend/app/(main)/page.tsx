@@ -96,16 +96,8 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredLecturers.map((lecturer: any) => (
               <Link key={lecturer.id} href={`/lecturers/${lecturer.id}`} className="group relative block bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-300 dark:border-slate-700 hover:border-blue-500 hover:shadow-2xl shadow-lg transition-all duration-300">
-                <div className="absolute top-4 right-4 z-10">
-                  <div className="relative group/tooltip">
-                    <div className={`p-2 rounded-full border ${lecturer.engagementScore && lecturer.engagementScore > 50 ? 'bg-orange-100 text-orange-600 border-orange-200 dark:bg-orange-900/30 dark:border-orange-800' : 'bg-slate-50 text-slate-300 border-slate-100 dark:bg-slate-800 dark:border-slate-700'}`}>
-                      <Flame className={`w-6 h-6 ${(lecturer.engagementScore && lecturer.engagementScore > 50) ? 'animate-pulse' : ''}`} />
-                    </div>
-                    <div className="absolute top-full right-0 mt-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 shadow-xl z-20 pointer-events-none">
-                      <p className="font-semibold mb-1 text-orange-400">🔥 {t('lecturers.hot_tooltip').split(':')[0]}</p>
-                      {t('lecturers.hot_tooltip').split(':')[1]}
-                    </div>
-                  </div>
+                <div className="absolute top-4 right-4 z-10 text-slate-300 dark:text-slate-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
+                  <Star className="w-6 h-6" />
                 </div>
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-xl font-bold text-blue-600 dark:text-blue-400 shadow-md border-2 border-white dark:border-slate-600 mb-4 group-hover:scale-105 transition-transform">
                   {lecturer.fullName.charAt(0)}
@@ -117,6 +109,18 @@ export default function Home() {
                   {lecturer.department}
                 </p>
                 <div className="flex items-center gap-2 text-xs font-semibold">
+
+                  <div className="relative group/tooltip">
+                    <span className={`px-2 py-1 rounded-lg border flex items-center gap-1 cursor-help ${lecturer.engagementScore && lecturer.engagementScore > 50 ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800' : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'}`}>
+                      <Flame className={`w-3 h-3 ${(lecturer.engagementScore && lecturer.engagementScore > 50) ? 'animate-pulse' : ''}`} />
+                      {lecturer.engagementScore || 0}
+                    </span>
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 text-white text-[10px] rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 shadow-xl z-50 pointer-events-none text-center">
+                      <p className="font-bold mb-0.5 text-orange-400">🔥 {t('lecturers.hot_tooltip').split(':')[0]}</p>
+                      {t('lecturers.hot_tooltip').split(':')[1]}
+                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45"></div>
+                    </div>
+                  </div>
 
                   <span className="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
                     {lecturer.assignmentsCount || lecturer._count?.teachingAssignments || 0} môn
