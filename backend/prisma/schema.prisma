@@ -1,0 +1,311 @@
+// ========================================
+// 🗄️ PRISMA SCHEMA - ReviewLecturers
+// ========================================
+// Mô tả: Schema PostgreSQL cho hệ thống nhận xét giảng viên
+// ORM: Prisma
+// Database: PostgreSQL (Neon Cloud)
+// ========================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ========================================
+// 👤 BẢNG NGƯỜI DÙNG
+// ========================================
+
+/// Bảng lưu thông tin tất cả người dùng (sinh viên, giảng viên, admin)
+model User {
+  id         String   @id @default(uuid()) @db.Uuid
+  email      String   @unique @db.VarChar(255)
+  password   String   @db.VarChar(255) // Mật khẩu đã hash (bcrypt)
+  fullName   String   @map("full_name") @db.VarChar(255)
+  studentId  String?  @map("student_id") @db.VarChar(50) // Mã sinh viên (nullable)
+  profileUpdatedAt DateTime? @map("profile_updated_at") @db.Timestamptz(3) // Last profile edit (for cooldown)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  // Quan hệ
+  userRoles    UserRole[]     // Nhiều vai trò
+  lecturer     Lecturer?      // Liên kết với giảng viên (nếu có)
+  reviews      Review[]       // Các nhận xét đã viết
+  reviewVotes  ReviewVote[]   // Các vote cho review
+  reviewReplies ReviewReply[] // Các reply đã viết
+  replyVotes   ReplyVote[]    // Các vote cho reply
+  lecturerVotes LecturerVote[] // Các vote cho giảng viên
+  accessLogs   AccessLog[]    // Lịch sử truy cập
+
+  @@map("users")
+}
+
+// ========================================
+// 🔐 BẢNG VAI TRÒ & PHÂN QUYỀN
+// ========================================
+
+/// Bảng định nghĩa các vai trò (admin, student, lecturer)
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique @db.VarChar(50) // admin, student, lecturer
+  description String?  @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  // Quan hệ
+  userRoles UserRole[]
+
+  @@map("roles")
+}
+
+/// Bảng liên kết Many-to-Many giữa User và Role
+model UserRole {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  roleId     String   @map("role_id") @db.Uuid
+  assignedAt DateTime @default(now()) @map("assigned_at") @db.Timestamptz(3)
+
+  // Quan hệ
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId]) // Một user không thể có role trùng lặp
+  @@map("user_roles")
+}
+
+// ========================================
+// 👨‍🏫 BẢNG DỮ LIỆU HỌC THUẬT
+// ========================================
+
+/// Bảng lưu danh sách học vị (ThS, TS, PGS, GS, ...)
+model AcademicDegree {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique @db.VarChar(20) // VD: ThS, TS, PGS, GS
+  name        String   @db.VarChar(100) // VD: Thạc sĩ, Tiến sĩ, Phó Giáo sư
+  order       Int      @default(0) // Thứ tự hiển thị (GS > PGS > TS > ThS)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  lecturers   Lecturer[]
+
+  @@map("academic_degrees")
+}
+
+/// Bảng lưu danh sách giảng viên (từ nhà trường - đã trusted)
+model Lecturer {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String?  @unique @map("user_id") @db.Uuid // Liên kết với user (nullable)
+  degreeId   String?  @map("degree_id") @db.Uuid // Học vị
+  fullName   String   @map("full_name") @db.VarChar(255)
+  staffId    String   @unique @map("staff_id") @db.VarChar(50) // Mã giảng viên
+  email      String?  @db.VarChar(255)
+  upvoteCount   Int      @default(0) @map("upvote_count") @db.Integer
+  downvoteCount Int      @default(0) @map("downvote_count") @db.Integer
+  votes         LecturerVote[]
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  // Quan hệ
+  user                User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+  degree              AcademicDegree?      @relation(fields: [degreeId], references: [id], onDelete: SetNull)
+  teachingAssignments TeachingAssignment[]
+
+  @@map("lecturers")
+}
+
+/// Bảng lưu danh sách môn học
+model Subject {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique @db.VarChar(50) // Mã môn (VD: IT001)
+  name      String   @db.VarChar(255) // Tên môn
+  credits   Int?     @db.Integer // Số tín chỉ
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  // Quan hệ
+  teachingAssignments TeachingAssignment[]
+
+  @@map("subjects")
+}
+
+/// Bảng lưu danh sách học kỳ
+model AcademicTerm {
+  id        String    @id @default(uuid()) @db.Uuid
+  code      String    @unique @db.VarChar(50) // VD: "HK1_2425" (unique key for import)
+  name      String    @db.VarChar(100) // VD: "Học kỳ 1 - 2024-2025"
+  startDate DateTime? @map("start_date") @db.Date
+  endDate   DateTime? @map("end_date") @db.Date
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  // Quan hệ
+  teachingAssignments TeachingAssignment[]
+
+  @@map("academic_terms")
+}
+
+/// Bảng lưu danh sách cơ sở (nếu trường có nhiều campus)
+model Campus {
+  id      String  @id @default(uuid()) @db.Uuid
+  name    String  @db.VarChar(255)
+  address String? @db.VarChar(500)
+
+  // Quan hệ
+  teachingAssignments TeachingAssignment[]
+
+  @@map("campuses")
+}
+
+// ========================================
+// ⭐ BẢNG CỐT LÕI: PHÂN CÔNG GIẢNG DẠY
+// ========================================
+
+/// Bảng lưu phân công Giảng viên - Môn học - Học kỳ - Cơ sở
+/// ĐÂY LÀ ĐƠN VỊ NHỎ NHẤT ĐỂ SINH VIÊN NHẬN XÉT
+model TeachingAssignment {
+  id         String  @id @default(uuid()) @db.Uuid
+  lecturerId String  @map("lecturer_id") @db.Uuid
+  subjectId  String  @map("subject_id") @db.Uuid
+  termId     String  @map("term_id") @db.Uuid
+  campusId   String? @map("campus_id") @db.Uuid
+  classCode  String? @map("class_code") @db.VarChar(50) // Mã lớp (VD: IT001.M11)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  // Quan hệ
+  lecturer Lecturer     @relation(fields: [lecturerId], references: [id], onDelete: Cascade)
+  subject  Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  term     AcademicTerm @relation(fields: [termId], references: [id], onDelete: Cascade)
+  campus   Campus?      @relation(fields: [campusId], references: [id], onDelete: SetNull)
+  reviews  Review[]
+
+  @@unique([lecturerId, subjectId, termId, classCode]) // Tránh trùng lặp
+  @@map("teaching_assignments")
+}
+
+// ========================================
+// 💬 BẢNG COMMENT & REPLY SYSTEM
+// ========================================
+
+/// Bảng lưu nhận xét gốc (root comment)
+model Review {
+  id                    String   @id @default(uuid()) @db.Uuid
+  teachingAssignmentId  String   @map("teaching_assignment_id") @db.Uuid
+  userId                String   @map("user_id") @db.Uuid
+  content               String   @db.Text
+  isAnonymous           Boolean  @default(false) @map("is_anonymous")
+  upvoteCount           Int      @default(0) @map("upvote_count") @db.Integer
+  downvoteCount         Int      @default(0) @map("downvote_count") @db.Integer
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  // Quan hệ
+  teachingAssignment TeachingAssignment @relation(fields: [teachingAssignmentId], references: [id], onDelete: Cascade)
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  votes              ReviewVote[]
+  replies            ReviewReply[]
+
+  @@unique([userId, teachingAssignmentId]) // Một user chỉ viết 1 review cho mỗi assignment
+  @@index([teachingAssignmentId]) // Index để query nhanh
+  @@map("reviews")
+}
+
+/// Bảng lưu upvote/downvote cho review
+model ReviewVote {
+  id        String   @id @default(uuid()) @db.Uuid
+  reviewId  String   @map("review_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  voteType  VoteType @map("vote_type") // UPVOTE hoặc DOWNVOTE
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  // Quan hệ
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, reviewId]) // Một user chỉ vote 1 lần cho mỗi review
+  @@map("review_votes")
+}
+
+/// Bảng lưu reply (thảo luận) lồng nhau - TREE STRUCTURE
+model ReviewReply {
+  id            String   @id @default(uuid()) @db.Uuid
+  reviewId      String   @map("review_id") @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  parentId      String?  @map("parent_id") @db.Uuid // null = reply trực tiếp review
+  content       String   @db.Text
+  upvoteCount   Int      @default(0) @map("upvote_count") @db.Integer
+  downvoteCount Int      @default(0) @map("downvote_count") @db.Integer
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  // Quan hệ
+  review  Review        @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent  ReviewReply?  @relation("ReplyTree", fields: [parentId], references: [id], onDelete: Cascade)
+  replies ReviewReply[] @relation("ReplyTree") // Self-reference cho cấu trúc cây
+  votes   ReplyVote[]
+
+  @@index([reviewId]) // Index để query nhanh
+  @@index([parentId]) // Index cho tree query
+  @@map("review_replies")
+}
+
+/// Bảng lưu upvote/downvote cho reply
+model ReplyVote {
+  id        String   @id @default(uuid()) @db.Uuid
+  replyId   String   @map("reply_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  voteType  VoteType @map("vote_type")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  // Quan hệ
+  reply ReviewReply @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, replyId]) // Một user chỉ vote 1 lần cho mỗi reply
+  @@map("reply_votes")
+}
+
+/// Bảng lưu vote cho giảng viên (Up/Down)
+model LecturerVote {
+  id         String   @id @default(uuid()) @db.Uuid
+  lecturerId String   @map("lecturer_id") @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  voteType   VoteType @map("vote_type") // UPVOTE / DOWNVOTE
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  lecturer Lecturer @relation(fields: [lecturerId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lecturerId])
+  @@map("lecturer_votes")
+}
+
+// ========================================
+// 📊 BẢNG THỐNG KÊ
+// ========================================
+
+/// Bảng lưu lịch sử truy cập (cho admin)
+model AccessLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String?  @map("user_id") @db.Uuid // Nullable nếu chưa đăng nhập
+  ipAddress  String?  @map("ip_address") @db.VarChar(45)
+  userAgent  String?  @map("user_agent") @db.Text
+  action     String?  @db.VarChar(255) // VD: "VIEW_LECTURER", "CREATE_REVIEW"
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  // Quan hệ
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("access_logs")
+}
+
+// ========================================
+// 🔧 ENUMS
+// ========================================
+
+enum VoteType {
+  UPVOTE
+  DOWNVOTE
+}
