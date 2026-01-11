@@ -90,14 +90,16 @@ app.use(errorHandler);
 // 🚀 START SERVER
 // ========================================
 
-app.listen(PORT, () => {
-    console.log('========================================');
-    logger.success('ReviewLecturers Backend Server Started');
-    console.log('========================================');
-    logger.info(`Server running on: http://localhost:${PORT}`);
-    logger.info(`Database: ${process.env.DATABASE_URL?.split('@')[1]?.split('/')[0] || 'Neon PostgreSQL'}`);
-    logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log('========================================');
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log('========================================');
+        logger.success('ReviewLecturers Backend Server Started');
+        console.log('========================================');
+        logger.info(`Server running on: http://localhost:${PORT}`);
+        logger.info(`Database: ${process.env.DATABASE_URL?.split('@')[1]?.split('/')[0] || 'Neon PostgreSQL'}`);
+        logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log('========================================');
+    });
+}
 
 export default app;
