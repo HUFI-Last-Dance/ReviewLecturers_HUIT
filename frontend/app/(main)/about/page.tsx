@@ -10,7 +10,7 @@ export default function AboutPage() {
         <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
             {/* Hero Section */}
             <section className="relative py-20 bg-blue-700 dark:bg-blue-900 overflow-hidden">
-                <div className="absolute inset-0 bg-[url('/huit-banner.png')] bg-cover bg-center opacity-10 mix-blend-overlay"></div>
+                <div className="absolute inset-0 bg-[url('/huit-banner.png')] bg-cover bg-center opacity-5 mix-blend-overlay"></div>
                 <div className="container mx-auto px-4 relative z-10 text-center">
                     <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
                         {t('about.title')}
