@@ -58,7 +58,7 @@ export function Header() {
                         />
                     </div>
                     <div className="hidden sm:flex flex-col">
-                        <span className="font-bold text-lg leading-none text-[#A40000] dark:text-red-500">HUIT REVIEW</span>
+                        <span className="font-bold text-lg leading-none text-blue-800 dark:text-blue-400">HUIT REVIEW</span>
                         <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium tracking-wide">TRƯỜNG ĐH CÔNG THƯƠNG TP.HCM</span>
                     </div>
                 </Link>
@@ -146,7 +146,7 @@ export function Header() {
                                         </Button>
                                     </Link>
                                     <Link href="/register">
-                                        <Button size="sm" className="hidden sm:inline-flex bg-[#A40000] hover:bg-[#800000] dark:bg-red-700 dark:hover:bg-red-800">
+                                        <Button size="sm" className="hidden sm:inline-flex bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white">
                                             {t('auth.register')}
                                         </Button>
                                     </Link>

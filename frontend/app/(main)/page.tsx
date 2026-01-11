@@ -28,7 +28,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative pt-24 pb-12 overflow-hidden bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
         {/* Decorative blur */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-200/10 dark:bg-red-900/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-200/20 dark:bg-blue-900/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
         <div className="container mx-auto px-4 text-center">
           {/* Banner */}
@@ -48,7 +48,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/lecturers">
-              <Button size="lg" className="w-full sm:w-auto bg-[#A40000] hover:bg-[#800000] shadow-lg shadow-red-500/30 text-lg px-8 py-6 rounded-full">
+              <Button size="lg" className="w-full sm:w-auto bg-blue-700 hover:bg-blue-800 shadow-lg shadow-blue-500/30 text-lg px-8 py-6 rounded-full text-white">
                 {t('home.hero_cta')} <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
@@ -88,7 +88,7 @@ export default function Home() {
               </h2>
               <p className="text-slate-600 dark:text-slate-400 mt-1">Giảng viên được đánh giá sôi nổi nhất</p>
             </div>
-            <Link href="/lecturers" className="text-[#A40000] dark:text-red-400 font-semibold hover:underline flex items-center">
+            <Link href="/lecturers" className="text-blue-700 dark:text-blue-400 font-semibold hover:underline flex items-center">
               {t('home.view_all')} <ArrowRight className="w-4 h-4 ml-1" />
             </Link>
           </div>

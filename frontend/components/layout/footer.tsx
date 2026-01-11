@@ -23,7 +23,7 @@ export function Footer() {
                                 />
                             </div>
                             <div>
-                                <span className="text-lg font-bold text-[#A40000] dark:text-red-400">HUIT REVIEW</span>
+                                <span className="text-lg font-bold text-blue-800 dark:text-blue-400">HUIT REVIEW</span>
                                 <p className="text-xs text-slate-500 dark:text-slate-400">Trường ĐH Công Thương TP.HCM</p>
                             </div>
                         </Link>
@@ -37,17 +37,17 @@ export function Footer() {
                         <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-4">Liên kết nhanh</h3>
                         <ul className="space-y-2">
                             <li>
-                                <Link href="/" className="text-slate-600 dark:text-slate-400 hover:text-[#A40000] dark:hover:text-red-400 text-sm transition-colors">
+                                <Link href="/" className="text-slate-600 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-400 text-sm transition-colors">
                                     {t('nav.home')}
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/lecturers" className="text-slate-600 dark:text-slate-400 hover:text-[#A40000] dark:hover:text-red-400 text-sm transition-colors">
+                                <Link href="/lecturers" className="text-slate-600 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-400 text-sm transition-colors">
                                     {t('nav.lecturers')}
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/about" className="text-slate-600 dark:text-slate-400 hover:text-[#A40000] dark:hover:text-red-400 text-sm transition-colors">
+                                <Link href="/about" className="text-slate-600 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-400 text-sm transition-colors">
                                     {t('nav.about')}
                                 </Link>
                             </li>
