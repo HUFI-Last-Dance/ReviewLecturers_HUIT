@@ -52,6 +52,10 @@ export interface Review {
     createdAt: string;
     userVote?: 'UPVOTE' | 'DOWNVOTE' | null; // From API
     replies?: Reply[];
+    feedbackCommunication?: string;
+    feedbackKnowledge?: string;
+    feedbackExpertise?: string;
+    feedbackAttitude?: string;
 }
 
 export interface Reply {

@@ -2,7 +2,15 @@ import api from '@/lib/axios';
 
 export const reviewService = {
     // Tạo review
-    createReview: async (data: { teachingAssignmentId: string; content: string; isAnonymous?: boolean }) => {
+    createReview: async (data: {
+        teachingAssignmentId: string;
+        content: string;
+        isAnonymous?: boolean;
+        feedbackCommunication?: string;
+        feedbackKnowledge?: string;
+        feedbackExpertise?: string;
+        feedbackAttitude?: string;
+    }) => {
         const response = await api.post('/community/reviews', data);
         return response.data;
     },

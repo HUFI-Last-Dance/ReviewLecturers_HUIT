@@ -51,7 +51,12 @@ export const en = {
         write_your_review: "Write your review",
         placeholder: "Share thoughts on teaching, homework, exams...",
         post_anonymous: "Post anonymously",
-        submit: "Submit Review"
+        submit: "Submit Review",
+        feedback_communication: "Communication Style",
+        feedback_knowledge: "Teaching Knowledge",
+        feedback_expertise: "Professional Expertise",
+        feedback_attitude: "Attitude",
+        comments: "Additional Comments"
     },
     auth: {
         welcome_back: "Welcome back!",

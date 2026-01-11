@@ -51,7 +51,12 @@ export const vi = {
         write_your_review: "Viết nhận xét của bạn",
         placeholder: "Chia sẻ cảm nhận về cách dạy, bài tập, đề thi...",
         post_anonymous: "Đăng ẩn danh",
-        submit: "Gửi nhận xét"
+        submit: "Gửi nhận xét",
+        feedback_communication: "Cách truyền đạt",
+        feedback_knowledge: "Kiến thức giảng dạy",
+        feedback_expertise: "Trình độ chuyên môn",
+        feedback_attitude: "Thái độ",
+        comments: "Nhận xét khác"
     },
     auth: {
         welcome_back: "Chào mừng trở lại!",

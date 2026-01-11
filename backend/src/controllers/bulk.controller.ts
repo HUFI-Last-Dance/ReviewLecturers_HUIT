@@ -224,13 +224,16 @@ export const bulkImportTerms = async (
  * Bulk import teaching assignments
  * 
  * Body: [
+ * Body: [
  *   {
- *     lecturerStaffId: "GV001",
- *     subjectCode: "IT001",
- *     termName: "HK1 2024-2025",
- *     classCode: "IT001.M11",
- *     campusName: "Cơ sở 1"
+ *     lecturerStaffId: "GV001", // OR staff_id OR lecturer_id
+ *     subjectCode: "IT001",     // OR subject_code OR subject_id
+ *     termCode: "HK1_2425",     // OR term_code OR term_id
+ *     classCode: "IT001.M11",   // OR class_code
+ *     campusName: "Cơ sở 1"     // OR campus_name
  *   },
+ *   ...
+ * ]
  *   ...
  * ]
  */
@@ -253,95 +256,112 @@ export const bulkImportAssignments = async (
     for (let i = 0; i < assignments.length; i++) {
         const assignment = assignments[i];
 
+        // 1. Normalize input keys (support camelCase, snake_case, and DB column aliases)
+        const lecturerStaffId = assignment.lecturerStaffId || assignment.lecturer_staff_id || assignment.staff_id || assignment.lecturer_id;
+        const subjectCode = assignment.subjectCode || assignment.subject_code || assignment.subject_id;
+        const termCode = assignment.termCode || assignment.term_code || assignment.term_name || assignment.term_id;
+        const classCode = assignment.classCode || assignment.class_code;
+        const campusName = assignment.campusName || assignment.campus_name || assignment.campus_id; // Sometimes users put 'Cơ sở 1' in campus_id column in CSV
+
         try {
-            if (!assignment.lecturerStaffId || !assignment.subjectCode || !assignment.termCode) {
+            // 2. Validate normalized inputs
+            if (!lecturerStaffId || !subjectCode || !termCode) {
                 results.errors.push({
                     row: i + 1,
                     data: assignment,
-                    error: 'lecturerStaffId, subjectCode và termCode là bắt buộc',
+                    error: 'Missing required fields: lecturerStaffId (or staff_id), subjectCode (or code), termCode (or term_code)',
                 });
                 continue;
             }
 
-            // Find related records
+            // 3. Find Lecturer (by staffId)
             const lecturer = await prisma.lecturer.findUnique({
-                where: { staffId: assignment.lecturerStaffId },
+                where: { staffId: lecturerStaffId },
             });
 
             if (!lecturer) {
                 results.errors.push({
                     row: i + 1,
                     data: assignment,
-                    error: `Lecturer not found: ${assignment.lecturerStaffId}`,
+                    error: `Lecturer not found with staffId: ${lecturerStaffId}`,
                 });
                 continue;
             }
 
+            // 4. Find Subject (by code)
             const subject = await prisma.subject.findUnique({
-                where: { code: assignment.subjectCode },
+                where: { code: subjectCode },
             });
 
             if (!subject) {
                 results.errors.push({
                     row: i + 1,
                     data: assignment,
-                    error: `Subject not found: ${assignment.subjectCode}`,
+                    error: `Subject not found with code: ${subjectCode}`,
                 });
                 continue;
             }
 
-            // Use termCode instead of termName
+            // 5. Find Term (by code)
             const term = await prisma.academicTerm.findUnique({
-                where: { code: assignment.termCode },
+                where: { code: termCode },
             });
 
             if (!term) {
                 results.errors.push({
                     row: i + 1,
                     data: assignment,
-                    error: `Term not found: ${assignment.termCode}`,
+                    error: `Term not found with code: ${termCode}`,
                 });
                 continue;
             }
 
-            // Find or create campus (optional)
+            // 6. Find or Create Campus (by name)
             let campusId = null;
-            if (assignment.campusName) {
+            if (campusName) {
                 const campus = await prisma.campus.findFirst({
-                    where: { name: assignment.campusName },
+                    where: { name: campusName },
                 });
 
                 if (campus) {
                     campusId = campus.id;
                 } else {
                     const newCampus = await prisma.campus.create({
-                        data: { name: assignment.campusName },
+                        data: { name: campusName },
                     });
                     campusId = newCampus.id;
                 }
             }
 
-            // Check if assignment exists
+            // 7. Upsert Assignment
+            // Check existing based on unique constraint keys
+            const payload = {
+                lecturerId: lecturer.id,
+                subjectId: subject.id,
+                termId: term.id,
+                classCode: classCode || null,
+            };
+
             const existing = await prisma.teachingAssignment.findFirst({
-                where: {
-                    lecturerId: lecturer.id,
-                    subjectId: subject.id,
-                    termId: term.id,
-                    classCode: assignment.classCode || null,
-                },
+                where: payload,
             });
 
             if (!existing) {
-                // Create
                 await prisma.teachingAssignment.create({
                     data: {
-                        lecturerId: lecturer.id,
-                        subjectId: subject.id,
-                        termId: term.id,
-                        classCode: assignment.classCode || null,
+                        ...payload,
                         campusId,
                     },
                 });
+            } else {
+                // If exists, maybe update campus if provided? 
+                // For now, let's just update campus if it was missing or different
+                if (campusId && existing.campusId !== campusId) {
+                    await prisma.teachingAssignment.update({
+                        where: { id: existing.id },
+                        data: { campusId }
+                    });
+                }
             }
 
             results.success++;

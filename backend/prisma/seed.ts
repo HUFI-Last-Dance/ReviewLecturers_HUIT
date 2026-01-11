@@ -175,7 +175,6 @@ async function main() {
         fullName: 'TS. Nguyễn Văn C',
         staffId: 'GV001',
         email: 'nguyenvanc@school.edu.vn',
-        department: 'Khoa Công nghệ Thông tin',
     };
 
     const existingLecturer = await prisma.lecturer.findUnique({

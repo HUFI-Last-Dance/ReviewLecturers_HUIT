@@ -171,14 +171,22 @@ export default function Home() {
 
                 <div className="mb-4">
                   <Link
-                    href={`/assignments/${review.teachingAssignmentId}`}
+                    href={`/assignments/${review.teachingAssignmentId}#review-${review.id}`}
                     className="text-xs font-semibold text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors inline-block mb-2"
                   >
-                    {review.teachingAssignment.subject.code} - {review.teachingAssignment.lecturer.fullName}
+                    {review.teachingAssignment.subject.name} - {review.teachingAssignment.lecturer.fullName}
                   </Link>
-                  <p className="text-slate-700 dark:text-slate-300 text-sm line-clamp-3 leading-relaxed">
-                    {review.content}
-                  </p>
+                  <Link href={`/assignments/${review.teachingAssignmentId}#review-${review.id}`} className="block group">
+
+                    <p className="text-slate-700 dark:text-slate-300 text-xs line-clamp-3 leading-relaxed group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors">
+                      ({review.teachingAssignment.term.name})
+                    </p>
+                    <p className="text-slate-700 dark:text-slate-300 text-base line-clamp-3 leading-relaxed group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors">
+                      {review.content}
+                    </p>
+
+                  </Link>
+
                 </div>
 
                 <div className="flex items-center justify-between pt-4 border-t-2 border-slate-100 dark:border-slate-800">

@@ -193,6 +193,10 @@ model Review {
   userId                String   @map("user_id") @db.Uuid
   content               String   @db.Text
   isAnonymous           Boolean  @default(false) @map("is_anonymous")
+  feedbackCommunication String?  @map("feedback_communication") @db.Text // Cách truyền đạt
+  feedbackKnowledge     String?  @map("feedback_knowledge") @db.Text     // Kiến thức giảng dạy
+  feedbackExpertise     String?  @map("feedback_expertise") @db.Text     // Trình độ chuyên môn
+  feedbackAttitude      String?  @map("feedback_attitude") @db.Text      // Thái độ
   upvoteCount           Int      @default(0) @map("upvote_count") @db.Integer
   downvoteCount         Int      @default(0) @map("downvote_count") @db.Integer
   createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(3)

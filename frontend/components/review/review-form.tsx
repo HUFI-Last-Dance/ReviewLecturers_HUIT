@@ -15,6 +15,10 @@ import { useLanguage } from '@/contexts/language-context';
 const reviewSchema = z.object({
     content: z.string().min(10, 'MIN_LENGTH_10'),
     isAnonymous: z.boolean(),
+    feedbackCommunication: z.string().optional(),
+    feedbackKnowledge: z.string().optional(),
+    feedbackExpertise: z.string().optional(),
+    feedbackAttitude: z.string().optional(),
 });
 
 type ReviewFormType = z.infer<typeof reviewSchema>;
@@ -43,6 +47,10 @@ export function ReviewForm({ assignmentId }: { assignmentId: string }) {
                 teachingAssignmentId: assignmentId,
                 content: data.content,
                 isAnonymous: data.isAnonymous,
+                feedbackCommunication: data.feedbackCommunication,
+                feedbackKnowledge: data.feedbackKnowledge,
+                feedbackExpertise: data.feedbackExpertise,
+                feedbackAttitude: data.feedbackAttitude,
             }),
         onSuccess: () => {
             toast.success(t('review.success_create'));
@@ -80,15 +88,53 @@ export function ReviewForm({ assignmentId }: { assignmentId: string }) {
                 {t('review.write_your_review')}
             </h3>
 
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <textarea
-                    className="w-full min-h-[120px] p-4 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-400/10 transition-all text-slate-700 text-sm resize-y placeholder:text-slate-400 dark:placeholder:text-slate-500"
-                    placeholder={t('review.placeholder')}
-                    {...register('content')}
-                />
-                {errors.content && (
-                    <p className="text-red-500 text-xs mt-2">{errors.content.message === 'MIN_LENGTH_10' ? t('review.validation_content_min') : errors.content.message}</p>
-                )}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 block">{t('review.feedback_communication')}</label>
+                        <textarea
+                            className="w-full text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 outline-none focus:border-blue-500 transition-all resize-none h-20"
+                            placeholder={t('review.feedback_communication')}
+                            {...register('feedbackCommunication')}
+                        />
+                    </div>
+                    <div>
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 block">{t('review.feedback_knowledge')}</label>
+                        <textarea
+                            className="w-full text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 outline-none focus:border-blue-500 transition-all resize-none h-20"
+                            placeholder={t('review.feedback_knowledge')}
+                            {...register('feedbackKnowledge')}
+                        />
+                    </div>
+                    <div>
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 block">{t('review.feedback_expertise')}</label>
+                        <textarea
+                            className="w-full text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 outline-none focus:border-blue-500 transition-all resize-none h-20"
+                            placeholder={t('review.feedback_expertise')}
+                            {...register('feedbackExpertise')}
+                        />
+                    </div>
+                    <div>
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 block">{t('review.feedback_attitude')}</label>
+                        <textarea
+                            className="w-full text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 outline-none focus:border-blue-500 transition-all resize-none h-20"
+                            placeholder={t('review.feedback_attitude')}
+                            {...register('feedbackAttitude')}
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 block">{t('review.comments')}</label>
+                    <textarea
+                        className="w-full min-h-[120px] p-4 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-400/10 transition-all text-slate-700 text-sm resize-y placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                        placeholder={t('review.placeholder')}
+                        {...register('content')}
+                    />
+                    {errors.content && (
+                        <p className="text-red-500 text-xs mt-2">{errors.content.message === 'MIN_LENGTH_10' ? t('review.validation_content_min') : errors.content.message}</p>
+                    )}
+                </div>
 
                 <div className="flex items-center justify-between mt-4">
                     <label className="flex items-center gap-2 cursor-pointer select-none">

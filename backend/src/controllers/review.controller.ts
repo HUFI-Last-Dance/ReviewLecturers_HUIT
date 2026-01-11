@@ -25,7 +25,15 @@ export const createReview = async (
     req: AuthenticatedRequest,
     res: Response
 ): Promise<void> => {
-    const { teachingAssignmentId, content, isAnonymous } = req.body;
+    const {
+        teachingAssignmentId,
+        content,
+        isAnonymous,
+        feedbackCommunication,
+        feedbackKnowledge,
+        feedbackExpertise,
+        feedbackAttitude
+    } = req.body;
     const userId = req.user!.userId;
 
     // Validate
@@ -67,6 +75,10 @@ export const createReview = async (
             teachingAssignmentId,
             content,
             isAnonymous: isAnonymous || false,
+            feedbackCommunication,
+            feedbackKnowledge,
+            feedbackExpertise,
+            feedbackAttitude
         },
         include: {
             user: {
@@ -301,7 +313,8 @@ export const getRecentReviews = async (req: Request, res: Response): Promise<voi
             teachingAssignment: {
                 include: {
                     lecturer: { select: { fullName: true } },
-                    subject: { select: { name: true, code: true } }
+                    subject: { select: { name: true, code: true } },
+                    term: { select: { name: true } }
                 }
             },
             _count: { select: { votes: true } }

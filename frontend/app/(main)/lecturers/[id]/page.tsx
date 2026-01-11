@@ -237,7 +237,10 @@ export default function LecturerDetailPage() {
                                 )}
                             </div>
 
-                            <div className="flex flex-col items-end">
+                            <div className="flex flex-col items-end gap-2">
+                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                                    {assignment.reviewsCount} nhận xét
+                                </span>
                                 <span className="inline-flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-sm font-semibold group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50 transition-colors">
                                     {t('lecturers.view_reviews')}
                                     <ArrowLeft className="w-4 h-4 rotate-180" />

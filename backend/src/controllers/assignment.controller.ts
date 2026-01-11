@@ -186,6 +186,10 @@ export const getAssignmentById = async (
                             replies: true,
                         },
                     },
+                    feedbackCommunication: true,
+                    feedbackKnowledge: true,
+                    feedbackExpertise: true,
+                    feedbackAttitude: true,
                 },
                 orderBy: [
                     { upvoteCount: 'desc' },
@@ -217,6 +221,10 @@ export const getAssignmentById = async (
             repliesCount: review._count.replies,
             userVote: (review as any).votes?.[0]?.voteType || null,
             createdAt: review.createdAt,
+            feedbackCommunication: review.feedbackCommunication,
+            feedbackKnowledge: review.feedbackKnowledge,
+            feedbackExpertise: review.feedbackExpertise,
+            feedbackAttitude: review.feedbackAttitude,
         })),
         reviewsCount: assignment._count.reviews,
     };

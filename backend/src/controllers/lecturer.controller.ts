@@ -69,6 +69,11 @@ export const getAllLecturers = async (
                             select: {
                                 upvoteCount: true,
                                 downvoteCount: true,
+                                _count: {
+                                    select: {
+                                        replies: true
+                                    }
+                                }
                             },
                         },
                     },
@@ -86,8 +91,8 @@ export const getAllLecturers = async (
         let totalReviewVotes = 0;
 
         lecturer.teachingAssignments.forEach(ta => {
-            reviewsCount += ta.reviews.length;
             ta.reviews.forEach(review => {
+                reviewsCount += 1 + (review._count?.replies || 0); // 1 root + replies
                 totalReviewVotes += review.upvoteCount + review.downvoteCount;
             });
         });
@@ -216,6 +221,11 @@ export const getLecturerById = async (
                         select: {
                             upvoteCount: true,
                             downvoteCount: true,
+                            _count: {
+                                select: {
+                                    replies: true
+                                }
+                            }
                         },
                     },
                 },
@@ -251,7 +261,7 @@ export const getLecturerById = async (
     let totalReviewVotes = 0;
 
     lecturer.teachingAssignments.forEach((ta: any) => {
-        reviewsCount += ta._count.reviews;
+        reviewsCount += ta._count.reviews; // This only counts root reviews for now, we might want to update this logic if engagement score needs to include replies too
         if (ta.reviews) {
             ta.reviews.forEach((r: any) => {
                 totalReviewVotes += (r.upvoteCount || 0) + (r.downvoteCount || 0);
@@ -266,14 +276,18 @@ export const getLecturerById = async (
         ...lecturer,
         myVote,
         engagementScore,
-        teachingAssignments: lecturer.teachingAssignments.map((ta) => ({
-            id: ta.id,
-            classCode: ta.classCode,
-            createdAt: ta.createdAt,
-            subject: ta.subject,
-            term: ta.term,
-            reviewsCount: ta._count.reviews,
-        })),
+        teachingAssignments: lecturer.teachingAssignments.map((ta) => {
+            const rootReviews = ta._count.reviews;
+            const replies = ta.reviews.reduce((acc: number, curr: any) => acc + (curr._count?.replies || 0), 0);
+            return {
+                id: ta.id,
+                classCode: ta.classCode,
+                createdAt: ta.createdAt,
+                subject: ta.subject,
+                term: ta.term,
+                reviewsCount: rootReviews + replies, // Sum of root + replies
+            };
+        }),
     };
 
     sendSuccess(res, response, 'Lấy thông tin giảng viên thành công');

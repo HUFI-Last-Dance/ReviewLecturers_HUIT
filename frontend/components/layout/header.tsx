@@ -33,6 +33,7 @@ export function Header() {
     const { user, logout, isLoading } = useAuth();
     const { t } = useLanguage();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
     const pathname = usePathname();
 
     const navItems = [
@@ -102,20 +103,34 @@ export function Header() {
 
                                     {/* Simple Dropdown for Demo */}
                                     <div className="relative group">
-                                        <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 cursor-pointer">
+                                        <div
+                                            className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 cursor-pointer"
+                                            onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                        >
                                             <User className="w-5 h-5" />
                                         </div>
 
                                         {/* Dropdown Menu */}
-                                        <div className="absolute right-0 top-full w-48 pt-2 hidden group-hover:block animate-in fade-in slide-in-from-top-2">
+                                        <div className={cn(
+                                            "absolute right-0 top-full w-48 pt-2 animate-in fade-in slide-in-from-top-2",
+                                            isProfileOpen ? "block" : "hidden group-hover:block"
+                                        )}>
                                             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-100 dark:border-slate-800 p-1">
-                                                <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg">
+                                                <Link
+                                                    href="/profile"
+                                                    className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg"
+                                                    onClick={() => setIsProfileOpen(false)}
+                                                >
                                                     <User className="w-4 h-4" />
                                                     Hồ sơ cá nhân
                                                 </Link>
 
                                                 {user.roles.includes('admin') && (
-                                                    <Link href="/admin/dashboard" className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg">
+                                                    <Link
+                                                        href="/admin/dashboard"
+                                                        className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg"
+                                                        onClick={() => setIsProfileOpen(false)}
+                                                    >
                                                         <ShieldCheck className="w-4 h-4" />
                                                         Admin Dashboard
                                                     </Link>
@@ -128,7 +143,10 @@ export function Header() {
                                                 <div className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
 
                                                 <button
-                                                    onClick={logout}
+                                                    onClick={() => {
+                                                        setIsProfileOpen(false);
+                                                        logout();
+                                                    }}
                                                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
                                                 >
                                                     <LogOut className="w-4 h-4" />

@@ -25,7 +25,10 @@ export function ReviewItem({ review }: ReviewItemProps) {
     };
 
     return (
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border-2 border-slate-200 dark:border-slate-700 shadow-md hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-lg transition-all duration-300">
+        <div
+            id={`review-${review.id}`}
+            className="bg-white dark:bg-slate-800 p-6 rounded-2xl border-2 border-slate-200 dark:border-slate-700 shadow-md hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-lg transition-all duration-300 scroll-mt-24 target:ring-2 target:ring-blue-500 target:shadow-xl"
+        >
             {/* Header */}
             <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 dark:text-slate-500">
@@ -42,6 +45,34 @@ export function ReviewItem({ review }: ReviewItemProps) {
                     </h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400">{formatDate(review.createdAt)}</p>
                 </div>
+            </div>
+
+            {/* Feedback Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                {review.feedbackCommunication && (
+                    <div className="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1">{t('review.feedback_communication')}</span>
+                        <p className="text-sm text-slate-800 dark:text-slate-200">{review.feedbackCommunication}</p>
+                    </div>
+                )}
+                {review.feedbackKnowledge && (
+                    <div className="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1">{t('review.feedback_knowledge')}</span>
+                        <p className="text-sm text-slate-800 dark:text-slate-200">{review.feedbackKnowledge}</p>
+                    </div>
+                )}
+                {review.feedbackExpertise && (
+                    <div className="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1">{t('review.feedback_expertise')}</span>
+                        <p className="text-sm text-slate-800 dark:text-slate-200">{review.feedbackExpertise}</p>
+                    </div>
+                )}
+                {review.feedbackAttitude && (
+                    <div className="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1">{t('review.feedback_attitude')}</span>
+                        <p className="text-sm text-slate-800 dark:text-slate-200">{review.feedbackAttitude}</p>
+                    </div>
+                )}
             </div>
 
             {/* Content */}
