@@ -47,7 +47,7 @@ export const errorHandler = (
     console.error('❌ Error:', {
         message: err.message,
         statusCode,
-        stack: err.stack,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
         isOperational,
         url: req.originalUrl,
         method: req.method,
@@ -59,10 +59,7 @@ export const errorHandler = (
         message,
     };
 
-    // Chỉ gửi stack trace trong development
-    if (process.env.NODE_ENV === 'development') {
-        response.stack = err.stack;
-    }
+
 
     res.status(statusCode).json(response);
 };

@@ -32,7 +32,7 @@ export interface ErrorResponse {
     success: false;
     message: string;
     errors?: any[];
-    stack?: string; // Chỉ hiển thị trong development
+
 }
 
 /**
