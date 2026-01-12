@@ -18,8 +18,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'HUIT REVIEW - Nền tảng Review Giảng viên dành cho sinh viên',
-  description: 'Cộng đồng sinh viên chia sẻ & đánh giá giảng viên minh bạch, văn minh.',
+  title: 'HUIT Review - Cổng thông tin đánh giá giảng viên',
+  description: 'Cộng đồng sinh viên HUIT chia sẻ & đánh giá giảng viên văn minh, khách quan. Dự án phi lợi nhuận do sinh viên phát triển.',
+  openGraph: {
+    title: 'HUIT Review - Cổng thông tin đánh giá giảng viên',
+    description: 'Cộng đồng sinh viên HUIT chia sẻ & đánh giá giảng viên văn minh, khách quan.',
+    siteName: 'HUIT Review',
+    images: [
+      {
+        url: '/images/social-share-banner.png',
+        width: 1200,
+        height: 630,
+        alt: 'HUIT Review Social Banner',
+      },
+    ],
+    locale: 'vi_VN',
+    type: 'website',
+  },
   icons: {
     icon: '/favicon.png',
     shortcut: '/favicon.png',
