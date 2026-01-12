@@ -19,7 +19,7 @@ export default function LecturersPage() {
 
     const degrees = [
         { code: '', name: 'Tất cả học vị' },
-        { code: 'CN', name: 'Cử nhân' },
+        { code: 'GV', name: 'Giảng viên' },
         { code: 'ThS', name: 'Thạc sĩ' },
         { code: 'TS', name: 'Tiến sĩ' },
         { code: 'PGS', name: 'Phó Giáo sư' },
