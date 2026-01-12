@@ -127,7 +127,7 @@ export default function LecturersPage() {
                                     </div>
 
                                     <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                        {lecturer.degree ? `${lecturer.degree} ` : ''}{lecturer.fullName}
+                                        {lecturer.fullName}
                                     </h3>
 
 
