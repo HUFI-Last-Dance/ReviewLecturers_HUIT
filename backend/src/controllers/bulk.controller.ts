@@ -4,6 +4,7 @@ import { AppError } from '../middleware/errorHandler';
 import { sendSuccess, sendCreated } from '../utils/response';
 import { AuthenticatedRequest } from '../types/auth.types';
 import logger from '../utils/logger';
+import { removeVietnameseDiacritics } from '../utils/vietnamese';
 
 // ========================================
 // 📥 BULK IMPORT APIs (Admin only - For N8N)
@@ -60,16 +61,21 @@ export const bulkImportLecturers = async (
                 }
             }
 
+            // Calculate new cleanName
+            const cleanName = removeVietnameseDiacritics(lecturer.fullName.toLowerCase());
+
             // Upsert (insert or update if exists)
             await prisma.lecturer.upsert({
                 where: { staffId: lecturer.staffId },
                 update: {
                     fullName: lecturer.fullName,
+                    cleanName, // <--- Added
                     email: lecturer.email || null,
                     degreeId: degreeId,
                 },
                 create: {
                     fullName: lecturer.fullName,
+                    cleanName, // <--- Added
                     staffId: lecturer.staffId,
                     email: lecturer.email || null,
                     degreeId: degreeId,

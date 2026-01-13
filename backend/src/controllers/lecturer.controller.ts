@@ -62,6 +62,8 @@ export const getAllLecturers = async (
                 staffId: true,
                 cleanName: true,
                 engagementScore: true,
+                totalReviews: true,       // <--- Cached
+                totalReviewVotes: true,   // <--- Cached
                 upvoteCount: true,
                 downvoteCount: true,
                 degree: {
@@ -70,27 +72,9 @@ export const getAllLecturers = async (
                         name: true,
                     },
                 },
-                // Đếm số teaching assignments
                 _count: {
                     select: {
                         teachingAssignments: true,
-                    },
-                },
-                // Lấy danh sách teaching assignments với reviews và votes
-                // Chỉ lấy dữ liệu cần thiết để tính toán hiển thị, giới hạn record con nếu cần
-                teachingAssignments: {
-                    select: {
-                        reviews: {
-                            select: {
-                                upvoteCount: true,
-                                downvoteCount: true,
-                                _count: {
-                                    select: {
-                                        replies: true
-                                    }
-                                }
-                            },
-                        },
                     },
                 },
             },
@@ -100,21 +84,6 @@ export const getAllLecturers = async (
 
     // Map data structure for response
     const mappedLecturers = lecturers.map((lecturer) => {
-        // Calculate detailed stats for the UI (reviews count, total votes)
-        let reviewsCount = 0;
-        let totalReviewVotes = 0;
-
-        lecturer.teachingAssignments.forEach(ta => {
-            ta.reviews.forEach(review => {
-                reviewsCount += 1 + (review._count?.replies || 0); // 1 root + replies
-                totalReviewVotes += review.upvoteCount + review.downvoteCount;
-            });
-        });
-
-        // Use the pre-calculated engagement score from DB 
-        // (Fallback to calculation if DB is not yet backfilled/updated, though we rely on DB mostly)
-        const dbEngagementScore = lecturer.engagementScore;
-
         return {
             id: lecturer.id,
             fullName: lecturer.fullName,
@@ -125,9 +94,9 @@ export const getAllLecturers = async (
             downvoteCount: lecturer.downvoteCount,
             totalVotes: lecturer.upvoteCount + lecturer.downvoteCount,
             assignmentsCount: lecturer._count.teachingAssignments,
-            reviewsCount,
-            totalReviewVotes,
-            engagementScore: dbEngagementScore,
+            reviewsCount: lecturer.totalReviews,      // <--- Use cached
+            totalReviewVotes: lecturer.totalReviewVotes, // <--- Use cached
+            engagementScore: lecturer.engagementScore,
         };
     });
 

@@ -52,6 +52,10 @@ export const updateLecturerEngagementScore = async (lecturerId: string): Promise
     // 4. Update
     await prisma.lecturer.update({
         where: { id: lecturerId },
-        data: { engagementScore }
+        data: {
+            engagementScore,
+            totalReviews: reviewsCount,
+            totalReviewVotes
+        }
     });
 };

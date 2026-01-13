@@ -83,7 +83,9 @@ async function main() {
             where: { id: lecturer.id },
             data: {
                 cleanName,
-                engagementScore
+                engagementScore,
+                totalReviews: reviewsCount,
+                totalReviewVotes: totalReviewVotes
             }
         });
 
