@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { asyncHandler } from '../middleware/errorHandler';
 import { authenticate, requireRole } from '../middleware/auth';
 import * as adminController from '../controllers/admin.controller';
+import * as backfillController from '../controllers/backfill.controller';
 
 // ========================================
 // 👑 ADMIN ROUTES (Admin only)
@@ -191,6 +192,17 @@ router.post(
     authenticate,
     requireRole(['admin']),
     asyncHandler(bulkController.bulkImportAssignments)
+);
+
+/**
+ * POST /api/admin/backfill-lecturers
+ * Backfill cleanName and engagementScore
+ */
+router.post(
+    '/backfill-lecturers',
+    authenticate,
+    requireRole(['admin']),
+    asyncHandler(backfillController.backfillLecturers)
 );
 
 export default router;

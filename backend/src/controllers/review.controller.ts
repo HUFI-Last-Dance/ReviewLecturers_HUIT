@@ -4,6 +4,7 @@ import { AppError } from '../middleware/errorHandler';
 import { sendSuccess, sendCreated } from '../utils/response';
 import { AuthenticatedRequest } from '../types/auth.types';
 import logger from '../utils/logger';
+import { updateLecturerEngagementScore } from '../utils/score';
 
 // ========================================
 // 💬 REVIEW/COMMENT CONTROLLER
@@ -105,6 +106,9 @@ export const createReview = async (
             },
         },
     });
+
+    // Update lecturer engagement score
+    updateLecturerEngagementScore(assignment.lecturerId).catch(console.error);
 
     logger.success(
         `User ${userId} created review for assignment ${teachingAssignmentId}`
@@ -244,6 +248,11 @@ export const deleteReview = async (
 
     const review = await prisma.review.findUnique({
         where: { id },
+        include: {
+            teachingAssignment: {
+                select: { lecturerId: true }
+            }
+        }
     });
 
     if (!review) {
@@ -258,6 +267,11 @@ export const deleteReview = async (
     await prisma.review.delete({
         where: { id },
     });
+
+    // Update engagement score
+    if (review.teachingAssignment?.lecturerId) {
+        updateLecturerEngagementScore(review.teachingAssignment.lecturerId).catch(console.error);
+    }
 
     logger.warn(`Review ${id} deleted by user ${userId}`);
     sendSuccess(res, null, 'Xóa review thành công');

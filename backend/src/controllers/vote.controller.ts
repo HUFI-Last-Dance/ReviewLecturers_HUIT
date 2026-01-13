@@ -4,6 +4,7 @@ import { AppError } from '../middleware/errorHandler';
 import { sendSuccess, sendCreated } from '../utils/response';
 import { AuthenticatedRequest } from '../types/auth.types';
 import logger from '../utils/logger';
+import { updateLecturerEngagementScore } from '../utils/score';
 
 // ========================================
 // 👍 VOTE CONTROLLER (Upvote/Downvote)
@@ -31,6 +32,11 @@ export const voteReview = async (
     // Check review exists
     const review = await prisma.review.findUnique({
         where: { id: reviewId },
+        include: {
+            teachingAssignment: {
+                select: { lecturerId: true }
+            }
+        }
     });
 
     if (!review) {
@@ -93,6 +99,11 @@ export const voteReview = async (
             downvoteCount: downvotes,
         },
     });
+
+    // Update lecturer engagement score
+    if (review.teachingAssignment?.lecturerId) {
+        updateLecturerEngagementScore(review.teachingAssignment.lecturerId).catch(console.error);
+    }
 
     logger.info(`User ${userId} ${action} ${voteType} on review ${reviewId}`);
 

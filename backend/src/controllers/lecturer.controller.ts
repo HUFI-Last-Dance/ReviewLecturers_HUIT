@@ -3,6 +3,7 @@ import prisma from '../config/database';
 import { AppError } from '../middleware/errorHandler';
 import { sendSuccess } from '../utils/response';
 import { removeVietnameseDiacritics } from '../utils/vietnamese';
+import { updateLecturerEngagementScore } from '../utils/score';
 
 // ========================================
 // 👨‍🏫 LECTURER API (Public - Không cần auth)
@@ -31,23 +32,36 @@ export const getAllLecturers = async (
         where.degree = { code: degreeCode.trim() };
     }
 
-    // NOTE: Search filtering is done in JavaScript after mapping 
-    // to support Vietnamese diacritics (e.g. "Le" matches "Lê")
+    // Filter by search term (name)
+    if (search && search.trim()) {
+        // Search by cleanName (optimization) OR original fullName
+        const searchClean = removeVietnameseDiacritics(search.trim().toLowerCase());
+        where.OR = [
+            { cleanName: { contains: searchClean } },
+            { fullName: { contains: search.trim(), mode: 'insensitive' } }
+        ];
+    }
 
-    // For search or engagement sorting, we need all records to filter/sort properly
-    const needsAllRecords = (search && search.trim()) || sort === 'engagement';
-    const fetchLimit = needsAllRecords ? 1000 : limit;
-    const fetchSkip = needsAllRecords ? 0 : skip;
+    // Determine sort order
+    let orderBy: any = {};
+    if (sort === 'engagement') {
+        orderBy = { engagementScore: 'desc' };
+    } else {
+        orderBy = { fullName: 'asc' };
+    }
 
     const [lecturers, total] = await Promise.all([
         prisma.lecturer.findMany({
             where,
-            skip: fetchSkip,
-            take: fetchLimit,
+            skip,
+            take: limit,
+            orderBy,
             select: {
                 id: true,
                 fullName: true,
                 staffId: true,
+                cleanName: true,
+                engagementScore: true,
                 upvoteCount: true,
                 downvoteCount: true,
                 degree: {
@@ -63,6 +77,7 @@ export const getAllLecturers = async (
                     },
                 },
                 // Lấy danh sách teaching assignments với reviews và votes
+                // Chỉ lấy dữ liệu cần thiết để tính toán hiển thị, giới hạn record con nếu cần
                 teachingAssignments: {
                     select: {
                         reviews: {
@@ -79,14 +94,13 @@ export const getAllLecturers = async (
                     },
                 },
             },
-            orderBy: { fullName: 'asc' },
         }),
         prisma.lecturer.count({ where }),
     ]);
 
-    // Map and calculate engagement score
-    let mappedLecturers = lecturers.map((lecturer) => {
-        // Count reviews and their votes
+    // Map data structure for response
+    const mappedLecturers = lecturers.map((lecturer) => {
+        // Calculate detailed stats for the UI (reviews count, total votes)
         let reviewsCount = 0;
         let totalReviewVotes = 0;
 
@@ -97,10 +111,9 @@ export const getAllLecturers = async (
             });
         });
 
-        // Calculate engagement score:
-        // (lecturerVotes * 2) + totalReviewVotes + reviewsCount
-        const lecturerVotes = lecturer.upvoteCount + lecturer.downvoteCount;
-        const engagementScore = (lecturerVotes * 2) + totalReviewVotes + reviewsCount;
+        // Use the pre-calculated engagement score from DB 
+        // (Fallback to calculation if DB is not yet backfilled/updated, though we rely on DB mostly)
+        const dbEngagementScore = lecturer.engagementScore;
 
         return {
             id: lecturer.id,
@@ -110,44 +123,21 @@ export const getAllLecturers = async (
             degreeCode: lecturer.degree?.code || null,
             upvoteCount: lecturer.upvoteCount,
             downvoteCount: lecturer.downvoteCount,
-            totalVotes: lecturerVotes,
+            totalVotes: lecturer.upvoteCount + lecturer.downvoteCount,
             assignmentsCount: lecturer._count.teachingAssignments,
             reviewsCount,
             totalReviewVotes,
-            engagementScore,
+            engagementScore: dbEngagementScore,
         };
     });
-
-    // Vietnamese diacritics-insensitive search filtering
-    if (search && search.trim()) {
-        const searchNormalized = removeVietnameseDiacritics(search.trim().toLowerCase());
-        mappedLecturers = mappedLecturers.filter(l => {
-            const nameNormalized = removeVietnameseDiacritics(l.fullName.toLowerCase());
-            return nameNormalized.includes(searchNormalized) ||
-                l.fullName.toLowerCase().includes(search.trim().toLowerCase());
-        });
-    }
-
-    // Get filtered count before pagination
-    const filteredTotal = mappedLecturers.length;
-
-    // Apply sorting
-    if (sort === 'engagement') {
-        mappedLecturers = mappedLecturers.sort((a, b) => b.engagementScore - a.engagementScore);
-    }
-
-    // Apply pagination after filtering
-    if (needsAllRecords) {
-        mappedLecturers = mappedLecturers.slice(skip, skip + limit);
-    }
 
     const response = {
         lecturers: mappedLecturers,
         pagination: {
             page,
             limit,
-            total: needsAllRecords ? filteredTotal : total,
-            totalPages: Math.ceil((needsAllRecords ? filteredTotal : total) / limit),
+            total,
+            totalPages: Math.ceil(total / limit),
         },
     };
 
@@ -354,7 +344,19 @@ export const voteLecturer = async (
                         },
                     },
                 });
+                await prisma.lecturer.update({
+                    where: { id: lecturerId },
+                    data: {
+                        [voteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
+                            decrement: 1,
+                        },
+                    },
+                });
             });
+
+            // Update engagement score (async, non-blocking)
+            updateLecturerEngagementScore(lecturerId).catch(console.error);
+
             sendSuccess(res, { voted: false, voteType: null }, 'Đã hủy vote');
         } else {
             // Change vote (Up -> Down or Down -> Up)
@@ -377,6 +379,10 @@ export const voteLecturer = async (
                     },
                 });
             });
+
+            // Update engagement score
+            updateLecturerEngagementScore(lecturerId).catch(console.error);
+
             sendSuccess(res, { voted: true, voteType }, 'Đã thay đổi vote thành công');
         }
     } else {
@@ -399,6 +405,9 @@ export const voteLecturer = async (
                 },
             });
         });
+
+        // Update engagement score
+        updateLecturerEngagementScore(lecturerId).catch(console.error);
 
         sendSuccess(res, { voted: true, voteType }, 'Vote thành công');
     }
