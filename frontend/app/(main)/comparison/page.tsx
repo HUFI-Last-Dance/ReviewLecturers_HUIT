@@ -1,6 +1,6 @@
-
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation'; // Added useRouter
 import { useQuery } from '@tanstack/react-query';
 import { academicService } from '@/services/academic.service';
@@ -9,7 +9,19 @@ import { ArrowLeft, BookOpen, Star, AlertCircle } from 'lucide-react'; // Added 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
-export default function ComparisonPage() {
+function LoadingState() {
+    return (
+        <div className="container mx-auto px-4 py-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {[1, 2].map(i => (
+                    <div key={i} className="h-96 bg-slate-100 rounded-xl animate-pulse" />
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function ComparisonContent() {
     const searchParams = useSearchParams();
     const router = useRouter(); // Added router
     const ids = searchParams.get('ids')?.split(',') || [];
@@ -42,15 +54,7 @@ export default function ComparisonPage() {
     });
 
     if (isLoading) {
-        return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {[1, 2].map(i => (
-                        <div key={i} className="h-96 bg-slate-100 rounded-xl animate-pulse" />
-                    ))}
-                </div>
-            </div>
-        );
+        return <LoadingState />;
     }
 
     if (!lecturers || lecturers.length === 0) return null;
@@ -142,5 +146,13 @@ export default function ComparisonPage() {
                 ))}
             </div>
         </div>
+    );
+}
+
+export default function ComparisonPage() {
+    return (
+        <Suspense fallback={<LoadingState />}>
+            <ComparisonContent />
+        </Suspense>
     );
 }

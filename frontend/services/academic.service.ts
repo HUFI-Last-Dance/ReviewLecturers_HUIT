@@ -40,7 +40,7 @@ export const academicService = {
 
     // 🔖 Bookmarks
     getMyBookmarks: async (params?: { page?: number; limit?: number }) => {
-        const response = await api.get('/bookmarks/lecturers', { params });
+        const response = await api.get<LecturerListResponse>('/bookmarks/lecturers', { params });
         return response.data;
     },
 
