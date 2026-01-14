@@ -18,6 +18,7 @@ export interface Lecturer {
         teachingAssignments: number;
         reviews: number;
     };
+    isBookmarked?: boolean;
 }
 
 export interface Subject {

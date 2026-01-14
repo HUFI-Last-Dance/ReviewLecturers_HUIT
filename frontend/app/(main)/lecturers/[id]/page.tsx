@@ -8,7 +8,9 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, BookOpen, Calendar, Filter, Flame } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/language-context';
-import { LecturerVoteButtons } from '@/components/lecturer/lecturer-vote-buttons';
+import { LecturerVoteButtons } from '@/components/lecturer/lecturer-vote-buttons'; // Restored import
+import { BookmarkButton } from '@/components/BookmarkButton'; // Added
+import { useComparison } from '@/contexts/comparison-context'; // Added
 
 interface Term {
     id: string;
@@ -23,6 +25,7 @@ export default function LecturerDetailPage() {
     const id = params.id as string;
     const { t } = useLanguage();
     const [selectedTermId, setSelectedTermId] = useState<string>('all');
+    const { addToCompare, removeFromCompare, isInComparison, selectedLecturers } = useComparison(); // Added hook
 
     const { data, isLoading, isError } = useQuery({
         queryKey: ['lecturer', id],
@@ -166,6 +169,39 @@ export default function LecturerDetailPage() {
                                 downvotes={lecturer.downvoteCount || 0}
                                 myVote={lecturer.myVote}
                             />
+
+                            <div className="h-8 w-[1px] bg-slate-200 dark:bg-slate-700 mx-2" />
+
+                            <BookmarkButton
+                                lecturerId={lecturer.id}
+                                initialIsBookmarked={lecturer.isBookmarked}
+                                className="h-10 w-10 rounded-full bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-600 shadow-sm"
+                            />
+
+                            <div
+                                className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors cursor-pointer ${isInComparison(lecturer.id)
+                                    ? "bg-indigo-50 border-indigo-200 text-indigo-700 dark:bg-indigo-900/20 dark:border-indigo-800 dark:text-indigo-400"
+                                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-700"
+                                    }`}
+                                onClick={() => {
+                                    if (isInComparison(lecturer.id)) {
+                                        removeFromCompare(lecturer.id);
+                                    } else {
+                                        if (selectedLecturers.length < 2) {
+                                            addToCompare(lecturer);
+                                        }
+                                    }
+                                }}
+                            >
+                                <input
+                                    type="checkbox"
+                                    checked={isInComparison(lecturer.id)}
+                                    readOnly
+                                    disabled={false}
+                                    className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 pointer-events-none"
+                                />
+                                <span className="text-sm font-medium">So sánh</span>
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-3">

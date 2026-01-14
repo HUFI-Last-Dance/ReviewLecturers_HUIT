@@ -62,11 +62,13 @@ import lecturerRoutes from './routes/lecturer.routes';
 import academicRoutes from './routes/academic.routes';
 import assignmentRoutes from './routes/assignment.routes';
 import communityRoutes from './routes/community.routes';
+import bookmarkRoutes from './routes/bookmark.routes';
 
 // Auth & Admin
 app.use('/api/test', testRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/bookmarks', bookmarkRoutes); // <--- Added
 
 // Core API (Public)
 app.use('/api/lecturers', lecturerRoutes);

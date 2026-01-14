@@ -7,6 +7,9 @@ import { AuthProvider } from '@/contexts/auth-context';
 import { LanguageProvider } from '@/contexts/language-context';
 import { ThemeProvider } from '@/components/theme-provider';
 
+import { ComparisonProvider } from '@/contexts/comparison-context';
+import { ComparisonBar } from '@/components/ComparisonBar';
+
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -34,6 +37,7 @@ export const metadata: Metadata = {
     ],
     locale: 'vi_VN',
     type: 'website',
+
   },
   icons: {
     icon: '/favicon.png',
@@ -56,10 +60,13 @@ export default function RootLayout({
         <ReactQueryProvider>
           <LanguageProvider>
             <AuthProvider>
-              <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-                {children}
-                <Toaster position="top-right" richColors />
-              </ThemeProvider>
+              <ComparisonProvider>
+                <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+                  {children}
+                  <ComparisonBar />
+                  <Toaster position="top-right" richColors />
+                </ThemeProvider>
+              </ComparisonProvider>
             </AuthProvider>
           </LanguageProvider>
         </ReactQueryProvider>
@@ -67,3 +74,4 @@ export default function RootLayout({
     </html>
   );
 }
+

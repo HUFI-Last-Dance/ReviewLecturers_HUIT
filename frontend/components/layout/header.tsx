@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useLanguage } from '@/contexts/language-context';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Menu, Search, ShieldCheck } from 'lucide-react';
+import { LogOut, User, Menu, Search, ShieldCheck, Bookmark } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
@@ -123,6 +123,15 @@ export function Header() {
                                                 >
                                                     <User className="w-4 h-4" />
                                                     Hồ sơ cá nhân
+                                                </Link>
+
+                                                <Link
+                                                    href="/profile/bookmarks"
+                                                    className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg"
+                                                    onClick={() => setIsProfileOpen(false)}
+                                                >
+                                                    <Bookmark className="w-4 h-4" />
+                                                    Giảng viên đã lưu
                                                 </Link>
 
                                                 {user.roles.includes('admin') && (

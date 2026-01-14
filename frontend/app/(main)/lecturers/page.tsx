@@ -9,6 +9,9 @@ import { Search, BookOpen, Star } from 'lucide-react';
 import Link from 'next/link';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useLanguage } from '@/contexts/language-context';
+import { BookmarkButton } from '@/components/BookmarkButton';
+import { useComparison } from '@/contexts/comparison-context';
+
 
 export default function LecturersPage() {
     const { t } = useLanguage();
@@ -16,6 +19,7 @@ export default function LecturersPage() {
     const debouncedSearch = useDebounce(searchTerm, 500);
     const [page, setPage] = useState(1);
     const [degreeFilter, setDegreeFilter] = useState('');
+    const { addToCompare, removeFromCompare, isInComparison, selectedLecturers } = useComparison(); // Hook usage moved here
 
     const degrees = [
         { code: '', name: 'Tất cả học vị' },
@@ -109,19 +113,49 @@ export default function LecturersPage() {
                                     key={lecturer.id}
                                     className="group bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                                 >
+
                                     <div className="flex items-start justify-between mb-4">
-                                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-xl border-2 border-white dark:border-slate-700 shadow-sm group-hover:scale-105 transition-transform">
-                                            {lecturer.fullName.charAt(0)}
-                                        </div>
-                                        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700/50 px-2 py-1 rounded-full border border-slate-100 dark:border-slate-700">
-                                            <div className="flex items-center gap-1">
-                                                <span className="text-green-600 dark:text-green-400 font-bold text-xs">{lecturer.upvoteCount || 0}</span>
-                                                <span className="text-green-500">▲</span>
-                                            </div>
-                                            <div className="w-[1px] h-3 bg-slate-200 dark:bg-slate-600"></div>
-                                            <div className="flex items-center gap-1">
-                                                <span className="text-red-500">▼</span>
-                                                <span className="text-red-600 dark:text-red-400 font-bold text-xs">{lecturer.downvoteCount || 0}</span>
+                                        {/* Avatar section... */}
+
+                                        <div className="flex flex-col items-end gap-2">
+                                            {/* Vote stats... */}
+
+                                            <div className="flex items-center gap-2">
+                                                {/* Compare Checkbox */}
+                                                <div
+                                                    className="flex items-center gap-2 mr-2"
+                                                    onClick={(e) => e.stopPropagation()} // Prevent link click without stopping checkbox
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        id={`compare-${lecturer.id}`}
+                                                        className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                                        checked={isInComparison(lecturer.id)}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                addToCompare(lecturer);
+                                                            } else {
+                                                                removeFromCompare(lecturer.id);
+                                                            }
+                                                        }}
+                                                        disabled={false}
+                                                    />
+                                                    <label
+                                                        htmlFor={`compare-${lecturer.id}`}
+                                                        className={`text-xs font-medium cursor-pointer ${isInComparison(lecturer.id)
+                                                            ? "text-indigo-600"
+                                                            : "text-slate-500 hover:text-slate-700"
+                                                            }`}
+                                                    >
+                                                        So sánh
+                                                    </label>
+                                                </div>
+
+                                                <BookmarkButton
+                                                    lecturerId={lecturer.id}
+                                                    initialIsBookmarked={lecturer.isBookmarked}
+                                                    className="bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-100 dark:border-slate-700"
+                                                />
                                             </div>
                                         </div>
                                     </div>

@@ -36,5 +36,16 @@ export const academicService = {
     getTerms: async () => {
         const response = await api.get('/academic/terms');
         return response.data;
+    },
+
+    // 🔖 Bookmarks
+    getMyBookmarks: async (params?: { page?: number; limit?: number }) => {
+        const response = await api.get('/bookmarks/lecturers', { params });
+        return response.data;
+    },
+
+    toggleBookmark: async (id: string) => {
+        const response = await api.post(`/bookmarks/lecturers/${id}`);
+        return response.data;
     }
 };

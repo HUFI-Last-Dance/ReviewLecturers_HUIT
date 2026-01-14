@@ -50,6 +50,18 @@ export const getAllLecturers = async (
         orderBy = { fullName: 'asc' };
     }
 
+    // Check user auth for bookmark status
+    let userId: string | null = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        try {
+            const token = authHeader.substring(7);
+            const jwt = require('jsonwebtoken'); // Lazy load
+            const payload = jwt.verify(token, process.env.JWT_SECRET);
+            userId = payload.userId;
+        } catch (e) { } // Ignore invalid token
+    }
+
     const [lecturers, total] = await Promise.all([
         prisma.lecturer.findMany({
             where,
@@ -62,8 +74,8 @@ export const getAllLecturers = async (
                 staffId: true,
                 cleanName: true,
                 engagementScore: true,
-                totalReviews: true,       // <--- Cached
-                totalReviewVotes: true,   // <--- Cached
+                totalReviews: true,
+                totalReviewVotes: true,
                 upvoteCount: true,
                 downvoteCount: true,
                 degree: {
@@ -82,6 +94,19 @@ export const getAllLecturers = async (
         prisma.lecturer.count({ where }),
     ]);
 
+    // Get bookmarks if user is logged in
+    let bookmarkedLecturerIds = new Set<string>();
+    if (userId) {
+        const bookmarks = await prisma.lecturerBookmark.findMany({
+            where: {
+                userId,
+                lecturerId: { in: lecturers.map(l => l.id) }
+            },
+            select: { lecturerId: true }
+        });
+        bookmarkedLecturerIds = new Set(bookmarks.map(b => b.lecturerId));
+    }
+
     // Map data structure for response
     const mappedLecturers = lecturers.map((lecturer) => {
         return {
@@ -94,9 +119,10 @@ export const getAllLecturers = async (
             downvoteCount: lecturer.downvoteCount,
             totalVotes: lecturer.upvoteCount + lecturer.downvoteCount,
             assignmentsCount: lecturer._count.teachingAssignments,
-            reviewsCount: lecturer.totalReviews,      // <--- Use cached
-            totalReviewVotes: lecturer.totalReviewVotes, // <--- Use cached
+            reviewsCount: lecturer.totalReviews,
+            totalReviewVotes: lecturer.totalReviewVotes,
             engagementScore: lecturer.engagementScore,
+            isBookmarked: bookmarkedLecturerIds.has(lecturer.id), // <--- Added
         };
     });
 
@@ -199,19 +225,35 @@ export const getLecturerById = async (
         throw new AppError('Giảng viên không tồn tại', 404);
     }
 
-    // Get user's vote if authenticated
+    // Get user's vote & bookmark if authenticated
     let myVote: 'UPVOTE' | 'DOWNVOTE' | null = null;
+    let isBookmarked = false;
+
     if (userId) {
-        const vote = await prisma.lecturerVote.findUnique({
-            where: {
-                userId_lecturerId: {
-                    userId: userId,
-                    lecturerId: id,
+        const [vote, bookmark] = await Promise.all([
+            prisma.lecturerVote.findUnique({
+                where: {
+                    userId_lecturerId: {
+                        userId: userId,
+                        lecturerId: id,
+                    },
                 },
-            },
-        });
+            }),
+            prisma.lecturerBookmark.findUnique({
+                where: {
+                    userId_lecturerId: {
+                        userId: userId,
+                        lecturerId: id,
+                    },
+                },
+            })
+        ]);
+
         if (vote) {
             myVote = vote.voteType as 'UPVOTE' | 'DOWNVOTE';
+        }
+        if (bookmark) {
+            isBookmarked = true;
         }
     }
 
@@ -234,6 +276,7 @@ export const getLecturerById = async (
     const response = {
         ...lecturer,
         myVote,
+        isBookmarked, // <--- Added
         engagementScore,
         teachingAssignments: lecturer.teachingAssignments.map((ta) => {
             const rootReviews = ta._count.reviews;
