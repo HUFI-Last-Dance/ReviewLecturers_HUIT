@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
 import { academicService } from '@/services/academic.service';
 import { LecturerList } from '@/components/lecturer/LecturerList';
@@ -27,7 +28,9 @@ export default async function LecturersPage({
     return (
         <div className="container mx-auto px-4 py-8">
             <HydrationBoundary state={dehydrate(queryClient)}>
-                <LecturerList />
+                <Suspense fallback={<div>Loading...</div>}>
+                    <LecturerList />
+                </Suspense>
             </HydrationBoundary>
         </div>
     );
