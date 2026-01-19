@@ -33,3 +33,9 @@ yarn-error.log*
 
 # Prisma
 /backend/prisma/migrations
+
+# Agent & AI configs
+.agent/
+.codex/
+.gemini/
+
