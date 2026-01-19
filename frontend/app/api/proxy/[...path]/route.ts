@@ -21,10 +21,15 @@ async function handleProxy(request: NextRequest, pathSegments: string[]) {
 
         const data = await response.blob();
 
+        // Tạo headers mới để tránh xung đột mã hóa dữ liệu
+        const responseHeaders = new Headers(response.headers);
+        responseHeaders.delete('content-encoding');
+        responseHeaders.delete('content-length');
+
         return new NextResponse(data, {
             status: response.status,
             statusText: response.statusText,
-            headers: response.headers,
+            headers: responseHeaders,
         });
     } catch (error) {
         console.error('Proxy Error:', error);
