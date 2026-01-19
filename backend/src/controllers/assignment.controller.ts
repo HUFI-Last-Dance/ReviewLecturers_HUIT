@@ -175,6 +175,11 @@ export const getAssignmentById = async (
                         select: {
                             id: true,
                             fullName: true,
+                            userRoles: {
+                                include: {
+                                    role: true,
+                                },
+                            },
                         },
                     },
                     votes: userId ? {
@@ -215,7 +220,11 @@ export const getAssignmentById = async (
             id: review.id,
             content: review.content,
             isAnonymous: review.isAnonymous,
-            author: review.isAnonymous ? null : review.user,
+            author: review.isAnonymous ? null : {
+                id: review.user.id,
+                fullName: review.user.fullName,
+                roles: review.user.userRoles.map((ur: any) => ur.role.name),
+            },
             upvoteCount: review.upvoteCount,
             downvoteCount: review.downvoteCount,
             repliesCount: review._count.replies,

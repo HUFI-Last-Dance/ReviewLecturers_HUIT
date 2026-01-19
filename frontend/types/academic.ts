@@ -46,7 +46,7 @@ export interface Review {
     id: string;
     content: string;
     isAnonymous: boolean;
-    author: { id: string; fullName: string } | null;
+    author: { id: string; fullName: string; roles?: string[] } | null;
     upvoteCount: number;
     downvoteCount: number;
     repliesCount: number;
@@ -62,7 +62,7 @@ export interface Review {
 export interface Reply {
     id: string;
     content: string;
-    user: { id: string; fullName: string }; // Reply always has user connected or logic
+    user: { id: string; fullName: string; roles?: string[] }; // Reply always has user connected or logic
     isAnonymous: boolean;
     upvoteCount: number;
     downvoteCount: number;

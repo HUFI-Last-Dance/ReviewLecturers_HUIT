@@ -86,6 +86,11 @@ export const createReview = async (
                 select: {
                     id: true,
                     fullName: true,
+                    userRoles: {
+                        include: {
+                            role: true,
+                        },
+                    },
                 },
             },
             teachingAssignment: {
@@ -114,7 +119,16 @@ export const createReview = async (
         `User ${userId} created review for assignment ${teachingAssignmentId}`
     );
 
-    sendCreated(res, review, 'Tạo review thành công');
+    const response = {
+        ...review,
+        author: review.isAnonymous ? null : {
+            id: review.user.id,
+            fullName: review.user.fullName,
+            roles: review.user.userRoles.map((ur: any) => ur.role.name),
+        },
+    };
+
+    sendCreated(res, response, 'Tạo review thành công');
 };
 
 /**
@@ -134,6 +148,11 @@ export const getReviewById = async (
                 select: {
                     id: true,
                     fullName: true,
+                    userRoles: {
+                        include: {
+                            role: true,
+                        },
+                    },
                 },
             },
             teachingAssignment: {
@@ -162,6 +181,11 @@ export const getReviewById = async (
                         select: {
                             id: true,
                             fullName: true,
+                            userRoles: {
+                                include: {
+                                    role: true,
+                                },
+                            },
                         },
                     },
                     replies: {
@@ -171,6 +195,11 @@ export const getReviewById = async (
                                 select: {
                                     id: true,
                                     fullName: true,
+                                    userRoles: {
+                                        include: {
+                                            role: true,
+                                        },
+                                    },
                                 },
                             },
                         },
@@ -189,7 +218,27 @@ export const getReviewById = async (
 
     const response = {
         ...review,
-        author: review.isAnonymous ? null : review.user,
+        author: review.isAnonymous ? null : {
+            id: review.user.id,
+            fullName: review.user.fullName,
+            roles: review.user.userRoles.map((ur: any) => ur.role.name),
+        },
+        replies: review.replies.map((reply: any) => ({
+            ...reply,
+            author: {
+                id: reply.user.id,
+                fullName: reply.user.fullName,
+                roles: reply.user.userRoles.map((ur: any) => ur.role.name),
+            },
+            replies: reply.replies.map((nested: any) => ({
+                ...nested,
+                author: {
+                    id: nested.user.id,
+                    fullName: nested.user.fullName,
+                    roles: nested.user.userRoles.map((ur: any) => ur.role.name),
+                },
+            }))
+        }))
     };
 
     sendSuccess(res, response, 'Lấy review thành công');
@@ -323,7 +372,17 @@ export const getRecentReviews = async (req: Request, res: Response): Promise<voi
         take: 6,
         orderBy: { createdAt: 'desc' },
         include: {
-            user: { select: { fullName: true } },
+            user: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    userRoles: {
+                        include: {
+                            role: true
+                        }
+                    }
+                }
+            },
             teachingAssignment: {
                 include: {
                     lecturer: { select: { fullName: true } },
@@ -337,7 +396,11 @@ export const getRecentReviews = async (req: Request, res: Response): Promise<voi
 
     const safeReviews = reviews.map(r => ({
         ...r,
-        user: r.isAnonymous ? null : r.user
+        author: r.isAnonymous ? null : {
+            id: r.user.id,
+            fullName: r.user.fullName,
+            roles: (r.user as any).userRoles.map((ur: any) => ur.role.name)
+        }
     }));
 
     sendSuccess(res, safeReviews, 'Lấy recent reviews thành công');

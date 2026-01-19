@@ -9,6 +9,8 @@ import { ReplyList } from './reply-list';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/language-context';
 
+import { RoleBadge } from '@/components/ui/RoleBadge';
+
 interface ReviewItemProps {
     review: Review;
 }
@@ -40,9 +42,14 @@ export function ReviewItem({ review }: ReviewItemProps) {
                 </div>
 
                 <div>
-                    <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm">
-                        {review.isAnonymous || !review.author ? t('review.anonymous_student') : review.author.fullName}
-                    </h4>
+                    <div className="flex items-center gap-2">
+                        <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm">
+                            {review.isAnonymous || !review.author ? t('review.anonymous_student') : review.author.fullName}
+                        </h4>
+                        {!review.isAnonymous && review.author && (
+                            <RoleBadge roles={review.author.roles} />
+                        )}
+                    </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400">{formatDate(review.createdAt)}</p>
                 </div>
             </div>

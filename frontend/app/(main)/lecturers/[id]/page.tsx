@@ -12,6 +12,8 @@ import { LecturerVoteButtons } from '@/components/lecturer/lecturer-vote-buttons
 import { BookmarkButton } from '@/components/BookmarkButton'; // Added
 import { useComparison } from '@/contexts/comparison-context'; // Added
 
+import { EngagementBadge } from '@/components/lecturer/engagement-badge';
+
 interface Term {
     id: string;
     name: string;
@@ -122,18 +124,7 @@ export default function LecturerDetailPage() {
 
                 {/* Hotness Indicator */}
                 <div className="absolute top-4 right-4 z-20">
-                    <div className="relative group/tooltip">
-                        <div className={`p-3 rounded-full border shadow-sm ${lecturer.engagementScore && lecturer.engagementScore > 50 ? 'bg-orange-100 text-orange-600 border-orange-200 dark:bg-orange-900/30 dark:border-orange-800' : 'bg-slate-50 text-slate-300 border-slate-100 dark:bg-slate-800 dark:border-slate-700'}`}>
-                            <Flame className={`w-8 h-8 ${lecturer.engagementScore && lecturer.engagementScore > 50 ? 'animate-pulse text-orange-600' : 'text-orange-500'}`} />
-                        </div>
-                        <div className="absolute top-full right-0 mt-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 shadow-xl z-30 pointer-events-none">
-                            <p className="font-semibold mb-1 text-orange-400 flex items-center gap-1">
-                                🔥 {t('lecturers.hot_tooltip').split(':')[0]}
-                                <span className="ml-auto bg-slate-800 px-1.5 py-0.5 rounded text-white font-mono">{lecturer.engagementScore || 0}</span>
-                            </p>
-                            {t('lecturers.hot_tooltip').split(':')[1]}
-                        </div>
-                    </div>
+                    <EngagementBadge score={lecturer.engagementScore || 0} />
                 </div>
 
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-4xl shadow-xl shadow-blue-500/20 z-10 shrink-0">

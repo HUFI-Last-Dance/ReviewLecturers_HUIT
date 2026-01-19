@@ -8,6 +8,7 @@ import { MessageSquare, Reply as ReplyIcon } from 'lucide-react';
 import { ReplyForm } from './reply-form';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
+import { RoleBadge } from '@/components/ui/RoleBadge';
 
 interface ReplyItemProps {
     reply: Reply;
@@ -36,6 +37,7 @@ export function ReplyItem({ reply, reviewId }: ReplyItemProps) {
                     <div className="bg-slate-50 rounded-2xl p-3 px-4 inline-block">
                         <div className="flex items-center gap-2 mb-1">
                             <span className="text-sm font-bold text-slate-900">{reply.user.fullName}</span>
+                            <RoleBadge roles={reply.user.roles} />
                             <span className="text-xs text-slate-400">{formatDate(reply.createdAt)}</span>
                         </div>
                         <p className="text-sm text-slate-700 whitespace-pre-wrap">{reply.content}</p>
