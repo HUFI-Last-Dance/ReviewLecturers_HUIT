@@ -6,8 +6,14 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 const getApiUrl = () => {
-    let url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-    // Nếu url không bắt đầu bằng http (và không phải relative path bắt đầu bằng /), thêm https://
+    // Nếu ở phía Client (trình duyệt), gọi qua proxy để giấu API thật
+    if (typeof window !== 'undefined') {
+        return '/api/proxy';
+    }
+
+    // Nếu ở phía Server, gọi trực tiếp đến Backend để tối ưu tốc độ
+    let url = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
     if (!url.startsWith('http') && !url.startsWith('/')) {
         url = `https://${url}`;
     }

@@ -4,10 +4,11 @@ import { academicService } from '@/services/academic.service';
 import { LecturerList } from '@/components/lecturer/LecturerList';
 
 export default async function LecturersPage({
-    searchParams,
+    searchParams: searchParamsPromise,
 }: {
-    searchParams: { [key: string]: string | string[] | undefined };
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+    const searchParams = await searchParamsPromise;
     const page = Number(searchParams.page) || 1;
     const search = typeof searchParams.search === 'string' ? searchParams.search : '';
     const degreeCode = typeof searchParams.degreeCode === 'string' ? searchParams.degreeCode : undefined;
