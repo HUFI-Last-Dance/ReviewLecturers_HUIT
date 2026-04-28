@@ -55,7 +55,6 @@ app.get('/health', (req, res) => {
 // 📍 API ROUTES
 // ========================================
 
-import testRoutes from './routes/test.routes';
 import authRoutes from './routes/auth.routes';
 import adminRoutes from './routes/admin.routes';
 import lecturerRoutes from './routes/lecturer.routes';
@@ -65,7 +64,6 @@ import communityRoutes from './routes/community.routes';
 import bookmarkRoutes from './routes/bookmark.routes';
 
 // Auth & Admin
-app.use('/api/test', testRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/bookmarks', bookmarkRoutes); // <--- Added

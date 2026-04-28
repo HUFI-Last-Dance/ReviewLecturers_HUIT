@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { asyncHandler } from '../middleware/errorHandler';
 import { authenticate, requireRole } from '../middleware/auth';
 import * as adminController from '../controllers/admin.controller';
-import * as backfillController from '../controllers/backfill.controller';
+import * as bulkController from '../controllers/bulk.controller';
 
 // ========================================
 // 👑 ADMIN ROUTES (Admin only)
@@ -119,12 +119,6 @@ router.get(
  * Verify lecturer (liên kết với user)
  * 
  * Body: { "userId": "uuid" }
- * 
- * Flow:
- * 1. Admin xem danh sách users
- * 2. Admin xem danh sách lecturers chưa verify
- * 3. Admin xác định user nào tương ứng với lecturer nào
- * 4. Admin gọi API này để liên kết
  */
 router.post(
     '/lecturers/:lecturerId/verify',
@@ -147,8 +141,6 @@ router.post(
 // ========================================
 // 📥 BULK IMPORT (For N8N)
 // ========================================
-
-import * as bulkController from '../controllers/bulk.controller';
 
 /**
  * POST /api/admin/bulk/lecturers
@@ -192,17 +184,6 @@ router.post(
     authenticate,
     requireRole(['admin']),
     asyncHandler(bulkController.bulkImportAssignments)
-);
-
-/**
- * POST /api/admin/backfill-lecturers
- * Backfill cleanName and engagementScore
- */
-router.post(
-    '/backfill-lecturers',
-    authenticate,
-    requireRole(['admin']),
-    asyncHandler(backfillController.backfillLecturers)
 );
 
 export default router;

@@ -1,0 +1,20 @@
+{
+  "name": "review-lecturers-monorepo",
+  "private": true,
+  "description": "Monorepo for ReviewLecturers project",
+  "workspaces": [
+    "backend",
+    "frontend",
+    "mobile"
+  ],
+  "scripts": {
+    "prepare": "husky",
+    "test:all": "npm test --workspaces --if-present",
+    "build:all": "npm run build --workspaces --if-present",
+    "build:backend": "npm run build --workspace=backend",
+    "build:frontend": "npm run build --workspace=frontend"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
