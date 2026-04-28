@@ -1,13 +1,23 @@
 # Dependencies
 node_modules
 .pnpm-store
-
+.code-review-graph
 # Testing
 coverage
-
+.*
 # Next.js
 .next/
 out/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.cursorrules
+.windsurfrules
+.kiro/steering/code-review-graph.md
+.claude/skills
+.claude/settings.json
+.git/hooks/pre-commit
+
 
 # Production
 build
