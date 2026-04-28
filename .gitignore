@@ -8,9 +8,7 @@ coverage
 # Next.js
 .next/
 out/
-AGENTS.md
-CLAUDE.md
-GEMINI.md
+
 .cursorrules
 .windsurfrules
 .kiro/steering/code-review-graph.md
@@ -37,6 +35,7 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+!.env.example
 
 # Vercel
 .vercel
@@ -48,4 +47,24 @@ yarn-error.log*
 .agent/
 .codex/
 .gemini/
+.claude/
+.cursor/
+.cursorrules
+.windsurf/
+.windsurfrules
+.roo/
+.trae/
+.continue/
+.kiro/
+.qoder/
+.opencode/
+.codebuddy/
+.mcp.json
+.opencode.json
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
 

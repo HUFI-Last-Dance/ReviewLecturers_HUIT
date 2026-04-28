@@ -61,6 +61,19 @@ export function Footer() {
                             <li>📍 140 Lê Trọng Tấn, Phường Tây Thạnh, TP.HCM</li>
                         </ul>
                     </div>
+
+                    {/* Mobile App */}
+                    <div>
+                        <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-4">Ứng dụng di động</h3>
+                        <div className="flex flex-col gap-3">
+                            <Link href="/download/android" className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors w-fit">
+                                <span className="text-xs font-medium">Download APK</span>
+                            </Link>
+                            <Link href="/download/ios" className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors w-fit">
+                                <span className="text-xs font-medium">App Store</span>
+                            </Link>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Bottom */}

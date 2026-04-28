@@ -8,12 +8,12 @@ import {
     TextStyle,
     TouchableOpacityProps,
 } from 'react-native';
-import { Colors, BorderRadius, Typography, Spacing } from '@/constants/Colors';
+import { Colors, BorderRadius, Typography, Spacing, Shadows } from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 
 interface ButtonProps extends TouchableOpacityProps {
     title: string;
-    variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+    variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'clay';
     size?: 'sm' | 'md' | 'lg';
     loading?: boolean;
     icon?: React.ReactNode;
@@ -36,7 +36,7 @@ export function Button({
 
     const getButtonStyles = (): ViewStyle => {
         const baseStyle: ViewStyle = {
-            borderRadius: BorderRadius.lg,
+            borderRadius: BorderRadius.xl,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
@@ -45,18 +45,23 @@ export function Button({
 
         // Size styles
         const sizeStyles: Record<string, ViewStyle> = {
-            sm: { paddingVertical: Spacing.sm, paddingHorizontal: Spacing.md },
-            md: { paddingVertical: Spacing.md, paddingHorizontal: Spacing.lg },
-            lg: { paddingVertical: Spacing.base, paddingHorizontal: Spacing.xl },
+            sm: { paddingVertical: Spacing.sm, paddingHorizontal: Spacing.lg },
+            md: { paddingVertical: Spacing.md, paddingHorizontal: Spacing.xl },
+            lg: { paddingVertical: Spacing.base, paddingHorizontal: Spacing.xl * 1.5 },
         };
 
         // Variant styles
         const variantStyles: Record<string, ViewStyle> = {
             primary: { backgroundColor: colors.primary },
             secondary: { backgroundColor: colors.surface },
-            outline: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border },
+            outline: { backgroundColor: 'transparent', borderWidth: 2, borderColor: colors.border },
             ghost: { backgroundColor: 'transparent' },
             danger: { backgroundColor: colors.error },
+            clay: {
+                backgroundColor: colors.primary,
+                borderWidth: 0,
+                ...Shadows.clay,
+            },
         };
 
         return {
@@ -80,6 +85,7 @@ export function Button({
             outline: { color: colors.text },
             ghost: { color: colors.primary },
             danger: { color: '#ffffff' },
+            clay: { color: colors.primaryForeground },
         };
 
         return {

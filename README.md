@@ -1,97 +1,101 @@
-# 🎓 ReviewLecturers - Platform nhận xét giảng viên
+# 🎓 ReviewLecturers - Student-Led Faculty Insights
 
-> Nền tảng web cho sinh viên đăng nhận xét về hoạt động giảng dạy theo từng **Giảng viên – Môn học – Học kỳ**, với hệ thống upvote/downvote và thảo luận công khai.
+[![Tech Stack](https://img.shields.io/badge/Stack-Next.js%20%7C%20Express%20%7C%20Prisma%20%7C%20Expo-blue)](https://github.com/nicodolas/ReviewLecturers_HUIT)
+[![Design Style](https://img.shields.io/badge/Design-Claymorphism-indigo)](d:/ReviewLecturers/design-system/reviewlecturers/MASTER.md)
+
+**ReviewLecturers** là nền tảng giúp sinh viên chia sẻ và tham khảo các đánh giá về chất lượng giảng dạy theo từng **Giảng viên – Môn học – Học kỳ**. Dự án được xây dựng với mục tiêu minh bạch hóa thông tin và cải thiện trải nghiệm học tập.
 
 ---
 
-## 📁 CẤU TRÚC DỰ ÁN
+## 🏗️ Kiến Trúc Hệ Thống (Monorepo)
 
-```
+```text
 ReviewLecturers/
-├── backend/              # Express + TypeScript + Prisma
-│   ├── src/
-│   │   ├── controllers/ # Logic xử lý
-│   │   ├── routes/      # Định nghĩa API
-│   │   ├── middleware/  # Auth & Validation
-│   │   └── utils/       # Helper functions
-│   ├── prisma/          # Schema & Seeds
-│   └── .env             # Environment variables
-│
-└── frontend/            # Next.js 15 + TypeScript + Tailwind
-    ├── app/             # App Router
-    ├── components/      # Reusable UI components
-    └── services/        # API integration
+├── backend/    # Node.js Express API + Prisma ORM (Neon DB/PostgreSQL)
+├── frontend/   # Next.js 15 (App Router) + Tailwind CSS v4
+├── mobile/     # React Native (Expo) - iOS & Android Support
+└── design-system/ # Master documentation for UI/UX
 ```
 
 ---
 
-## 🚀 TÍNH NĂNG ĐÃ HOÀN THÀNH
+## 🛠️ Tech Stack
 
-### Backend
-- ✅ **Authentication:** Đăng ký, Đăng nhập (JWT), Lấy thông tin user.
-- ✅ **Lecturer Management:** Tìm kiếm (hỗ trợ tiếng Việt không dấu), Lọc theo học vị, Phân trang.
-- ✅ **Review System:** Upvote/Downvote giảng viên & review.
-- ✅ **Profile:** Trang cá nhân, Cập nhật thông tin (có cooldown 3 ngày).
-- ✅ **Admin Tools:** Bulk Import (Giảng viên, Môn học, Học kỳ, Phân công) từ JSON.
-
-### Frontend
-- ✅ **UI/UX:** Giao diện Responsive, Dark Mode support.
-- ✅ **Features:** Tìm kiếm giảng viên Live search, Filter, Xem chi tiết review.
+- **Frontend:** Next.js 15, TanStack Query, Tailwind CSS v4, Lucide Icons.
+- **Backend:** Express.js, TypeScript, Prisma, JWT Auth, Winston Logging.
+- **Mobile:** Expo, React Native, Axios, SecureStore.
+- **Database:** PostgreSQL (Neon Serverless).
 
 ---
 
-## ⚙️ CÀI ĐẶT & CHẠY DỰ ÁN
+## ⚙️ Hướng Dẫn Cài Đặt (Cho Developer)
 
-### 1. Backend
+Dự án sử dụng biến môi trường để quản lý cấu hình. Vui lòng **không commit** file `.env` thật lên repo.
 
-Cần tạo file `backend/.env` (tham khảo mẫu hoặc hỏi admin dự án):
-```env
-DATABASE_URL="postgresql://..."
-JWT_SECRET="your-secret-key"
-PORT=5000
+### 1. Chuẩn bị biến môi trường
+Tại mỗi thư mục (`backend`, `frontend`, `mobile`), bạn sẽ thấy file `.env.example`. Hãy copy và tạo file `.env` tương ứng:
+
+```bash
+# Tại thư mục gốc
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env.local
+cp mobile/.env.example mobile/.env
 ```
 
-Chạy lệnh:
+### 2. Cài đặt chi tiết từng phần
+
+#### 🔹 Backend (Server API)
 ```bash
 cd backend
 npm install
 npx prisma generate
-npx prisma db push  # Cập nhật schema lên DB
-npm run seed        # (Tùy chọn) Tạo dữ liệu mẫu
-npm run dev         # Server chạy tại http://localhost:5000
+npx prisma db push # Đồng bộ schema lên database của bạn
+npm run dev        # Server chạy tại http://localhost:5000
 ```
 
-### 2. Frontend
-
-Cần tạo file `frontend/.env.local`:
-```env
-NEXT_PUBLIC_API_URL="http://localhost:5000/api"
-```
-
-Chạy lệnh:
+#### 🔹 Frontend (Web Client)
 ```bash
 cd frontend
 npm install
-npm run dev         # App chạy tại http://localhost:3000
+npm run dev        # App chạy tại http://localhost:3000
+```
+
+#### 🔹 Mobile (Expo App)
+```bash
+cd mobile
+npm install
+npx expo start     # Quét mã QR bằng ứng dụng Expo Go trên điện thoại
 ```
 
 ---
 
-## 📝 DEPLOYMENT
+## 🎨 Design System: Claymorphism
 
-### Backend (Render/Heroku/Vercel)
-- Set Environment Variables trên server tương ứng.
-- Build command: `npm run build`
-- Start command: `npm start`
-
-### Frontend (Vercel/Netlify)
-- Import repo.
-- Set `NEXT_PUBLIC_API_URL` trỏ về domain backend đã deploy (VD: `https://api.myapp.com/api`).
-- Preset: Next.js.
+Dự án này sử dụng phong cách **Claymorphism** (Bubbly/Soft UI). 
+- **Quy tắc thiết kế:** Mọi component phải tuân thủ bo góc `24px` và hiệu ứng đổ bóng kép (Shadow).
+- **Xem chi tiết:** [Design Master Guide](./design-system/reviewlecturers/MASTER.md).
 
 ---
 
-## 📞 SUPPORT
+## 🔐 Bảo Mật & Quy Tắc Contribution
 
-- **HUIT Review Team**
+1. **Environment Variables:** Luôn cập nhật file `.env.example` nếu bạn thêm biến môi trường mới.
+2. **Commit Message:** Sử dụng tiếng Anh hoặc tiếng Việt có dấu, mô tả rõ thay đổi (VD: `feat: add bookmark feature`, `fix: lecturer list loading`).
+3. **Branching:** Tạo nhánh mới từ `main` để phát triển tính năng (VD: `feature/clay-ui`).
+4. **Security Check:** Tuyệt đối không để lộ mật khẩu database hay JWT Secret trong code.
 
+---
+
+## 🚀 Deployment
+
+- **Backend:** Phù hợp deploy lên Render, Heroku hoặc Vercel (Serverless Functions).
+- **Frontend:** Tối ưu nhất cho Vercel.
+- **Mobile:** Build APK/IPA thông qua EAS (Expo Application Services).
+
+---
+
+## 📞 Liên Hệ & Hỗ Trợ
+
+Nếu bạn gặp lỗi trong quá trình cài đặt, hãy tạo một **Issue** hoặc liên hệ với Admin dự án.
+
+**HUIT Review Team** - *Build by students, for students.*

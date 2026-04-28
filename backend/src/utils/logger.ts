@@ -69,21 +69,8 @@ class Logger {
         this.log({ level: 'error', message, data });
     }
 
-    public debug(message: string, data?: any): void {
-        if (process.env.NODE_ENV === 'development') {
-            this.log({ level: 'debug', message, data });
-        }
-    }
-
     public success(message: string, data?: any): void {
         this.log({ level: 'success', message, data });
-    }
-
-    // Request logger
-    public request(method: string, url: string, statusCode?: number): void {
-        const emoji = statusCode && statusCode >= 400 ? '❌' : '✅';
-        const message = `${emoji} ${method} ${url}${statusCode ? ` - ${statusCode}` : ''}`;
-        this.info(message);
     }
 }
 

@@ -9,7 +9,7 @@ import { ArrowLeft, BookOpen, Calendar, Filter, Flame } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/language-context';
 import { LecturerVoteButtons } from '@/components/lecturer/lecturer-vote-buttons'; // Restored import
-import { BookmarkButton } from '@/components/BookmarkButton'; // Added
+import { BookmarkButton } from '@/components/lecturer/BookmarkButton'; // Added
 import { useComparison } from '@/contexts/comparison-context'; // Added
 
 import { EngagementBadge } from '@/components/lecturer/engagement-badge';

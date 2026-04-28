@@ -5,7 +5,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 
 interface CardProps {
     children: React.ReactNode;
-    variant?: 'default' | 'elevated' | 'outlined';
+    variant?: 'default' | 'elevated' | 'outlined' | 'clay';
     padding?: 'none' | 'sm' | 'md' | 'lg';
     style?: ViewStyle;
 }
@@ -30,6 +30,8 @@ export function Card({
         const variantStyles: Record<string, ViewStyle> = {
             default: {
                 backgroundColor: colors.surface,
+                borderWidth: 1,
+                borderColor: colors.border,
             },
             elevated: {
                 backgroundColor: colors.surface,
@@ -37,13 +39,18 @@ export function Card({
             },
             outlined: {
                 backgroundColor: colors.background,
-                borderWidth: 1,
+                borderWidth: 2,
                 borderColor: colors.border,
+            },
+            clay: {
+                backgroundColor: colors.surface,
+                borderWidth: 0,
+                ...Shadows.clay,
             },
         };
 
         return {
-            borderRadius: BorderRadius.lg,
+            borderRadius: BorderRadius.xl,
             ...paddingStyles[padding],
             ...variantStyles[variant],
         };

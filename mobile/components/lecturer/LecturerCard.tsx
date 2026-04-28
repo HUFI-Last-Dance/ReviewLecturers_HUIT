@@ -41,11 +41,11 @@ export function LecturerCard({ lecturer, showComparison = true, style }: Lecture
     return (
         <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
             <Card
-                variant="elevated"
+                variant="clay"
                 padding="md"
                 style={{
                     ...styles.card,
-                    ...(selected ? { borderWidth: 2, borderColor: colors.primary } : {}),
+                    ...(selected ? { borderWidth: 2, borderColor: colors.primary, backgroundColor: colors.background } : {}),
                     ...(style || {}),
                 }}
             >
@@ -187,9 +187,9 @@ const styles = StyleSheet.create({
         fontWeight: Typography.fontWeights.medium,
     },
     compareButton: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
         borderWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',

@@ -2,28 +2,28 @@
 export const Colors = {
   light: {
     // Primary colors
-    primary: '#6366f1', // Indigo
+    primary: '#0ea5e9', // Sky Blue
     primaryForeground: '#ffffff',
 
     // Background & Surface
-    background: '#ffffff',
-    surface: '#f8fafc',
-    surfaceHover: '#f1f5f9',
+    background: '#f0f9ff', // Soft Blue BG
+    surface: '#ffffff',
+    surfaceHover: '#f8fafc',
 
     // Text
-    text: '#0f172a',
-    textSecondary: '#64748b',
-    textMuted: '#94a3b8',
+    text: '#0c4a6e', // Deep Blue
+    textSecondary: '#334155',
+    textMuted: '#64748b',
 
     // Border
-    border: '#e2e8f0',
-    borderLight: '#f1f5f9',
+    border: '#e0f2fe',
+    borderLight: '#f0f9ff',
 
     // Status
     success: '#22c55e',
     warning: '#f59e0b',
     error: '#ef4444',
-    info: '#3b82f6',
+    info: '#0ea5e9',
 
     // Vote colors
     upvote: '#22c55e',
@@ -31,7 +31,7 @@ export const Colors = {
 
     // Tab bar
     tabIconDefault: '#94a3b8',
-    tabIconSelected: '#6366f1',
+    tabIconSelected: '#0ea5e9',
 
     // Skeleton
     skeleton: '#e2e8f0',
@@ -39,7 +39,7 @@ export const Colors = {
   },
   dark: {
     // Primary colors
-    primary: '#818cf8', // Lighter indigo for dark mode
+    primary: '#38bdf8', // Light sky blue
     primaryForeground: '#0f172a',
 
     // Background & Surface
@@ -48,7 +48,7 @@ export const Colors = {
     surfaceHover: '#334155',
 
     // Text
-    text: '#f8fafc',
+    text: '#f1f5f9',
     textSecondary: '#94a3b8',
     textMuted: '#64748b',
 
@@ -68,7 +68,7 @@ export const Colors = {
 
     // Tab bar
     tabIconDefault: '#64748b',
-    tabIconSelected: '#818cf8',
+    tabIconSelected: '#38bdf8',
 
     // Skeleton
     skeleton: '#334155',
@@ -114,10 +114,10 @@ export const Spacing = {
 
 // Border radius
 export const BorderRadius = {
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
+  sm: 6,
+  md: 12,
+  lg: 16,
+  xl: 24,
   full: 9999,
 };
 
@@ -143,5 +143,12 @@ export const Shadows = {
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 5,
+  },
+  clay: {
+    shadowColor: '#0c4a6e',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 8,
   },
 };

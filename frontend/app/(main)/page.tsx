@@ -26,9 +26,10 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative pt-24 pb-12 overflow-hidden bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+      <section className="relative pt-24 pb-12 overflow-hidden bg-gradient-to-b from-blue-100/50 to-white dark:from-slate-900 dark:to-slate-950 transition-colors duration-300">
         {/* Decorative blur */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-200/20 dark:bg-blue-900/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-sky-200/30 dark:bg-sky-900/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-pink-200/20 dark:bg-pink-900/5 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2" />
 
         <div className="container mx-auto px-4 text-center">
           {/* Banner */}
@@ -48,12 +49,12 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/lecturers">
-              <Button size="lg" className="w-full sm:w-auto bg-blue-700 hover:bg-blue-800 shadow-lg shadow-blue-500/30 text-lg px-8 py-6 rounded-full text-white">
+              <Button variant="clay" size="lg" className="w-full sm:w-auto text-lg px-8 py-6">
                 {t('home.hero_cta')} <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
             <Link href="/about">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto text-lg px-8 py-6 rounded-full border-2 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto text-lg px-8 py-6 rounded-[1.25rem] border-2 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800">
                 Tìm hiểu thêm
               </Button>
             </Link>
@@ -78,7 +79,7 @@ export default function Home() {
       </section>
 
       {/* Featured Lecturers */}
-      <section className="py-16 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+      <section className="py-16 bg-white dark:bg-slate-950 transition-colors duration-300">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-end mb-8">
             <div>
@@ -95,8 +96,8 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredLecturers.map((lecturer: any) => (
-              <Link key={lecturer.id} href={`/lecturers/${lecturer.id}`} className="group relative block bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-300 dark:border-slate-700 hover:border-blue-500 hover:shadow-2xl shadow-lg transition-all duration-300">
-                <div className="absolute top-4 right-4 z-10 text-slate-300 dark:text-slate-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
+              <Link key={lecturer.id} href={`/lecturers/${lecturer.id}`} className="group relative block clay-card p-6 border-none hover:translate-y-[-4px] transition-all duration-300">
+                <div className="absolute top-4 right-4 z-10 text-slate-300 dark:text-slate-600 group-hover:text-primary transition-colors">
                   <Star className="w-6 h-6" />
                 </div>
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-xl font-bold text-blue-600 dark:text-blue-400 shadow-md border-2 border-white dark:border-slate-600 mb-4 group-hover:scale-105 transition-transform">
@@ -203,6 +204,57 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* Mobile App Section */}
+      <section className="py-20 bg-blue-700 dark:bg-blue-900 overflow-hidden relative">
+        {/* Background blobs */}
+        <div className="absolute top-0 left-0 w-64 h-64 bg-blue-600 dark:bg-blue-800 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-600 dark:bg-indigo-800 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1 text-center lg:text-left text-white">
+              <h2 className="text-3xl md:text-4xl font-black mb-6">Trải nghiệm tốt hơn trên ứng dụng di động</h2>
+              <p className="text-blue-100 text-lg mb-10 max-w-xl">
+                Theo dõi giảng viên, nhận thông báo review mới và thảo luận cùng cộng đồng sinh viên HUIT ngay trên điện thoại của bạn.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                <Link href="/download/android" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full sm:w-auto bg-black hover:bg-slate-900 text-white border-none px-8 py-7 rounded-2xl flex items-center gap-3">
+                    <div className="text-left">
+                      <div className="text-[10px] uppercase font-bold opacity-70">Tải về cho</div>
+                      <div className="text-lg font-bold">Android (APK)</div>
+                    </div>
+                  </Button>
+                </Link>
+                <Link href="/download/ios" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full sm:w-auto bg-black hover:bg-slate-900 text-white border-none px-8 py-7 rounded-2xl flex items-center gap-3">
+                    <div className="text-left">
+                      <div className="text-[10px] uppercase font-bold opacity-70">Tải về trên</div>
+                      <div className="text-lg font-bold">App Store</div>
+                    </div>
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            <div className="flex-1 relative">
+              <div className="relative mx-auto w-[280px] h-[580px] bg-slate-800 rounded-[3rem] border-[8px] border-slate-900 shadow-2xl overflow-hidden">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-900 rounded-b-2xl z-20" />
+                <img
+                  src="/mobile-preview.png"
+                  alt="App Preview"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=280&h=580';
+                  }}
+                />
+              </div>
+              {/* Decorative circles */}
+              <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-blue-500/20 rounded-full blur-2xl" />
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
+
   );
 }

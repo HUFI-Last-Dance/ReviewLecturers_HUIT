@@ -9,7 +9,7 @@ import { Search, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useLanguage } from '@/contexts/language-context';
-import { BookmarkButton } from '@/components/BookmarkButton';
+import { BookmarkButton } from './BookmarkButton';
 import { useComparison } from '@/contexts/comparison-context';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -85,7 +85,7 @@ export function LecturerList() {
                             setDegreeFilter(e.target.value);
                             setPage(1);
                         }}
-                        className="h-11 px-3 rounded-lg border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="h-12 px-4 rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer appearance-none"
                     >
                         {degrees.map(d => (
                             <option key={d.code} value={d.code}>{d.name}</option>
@@ -112,10 +112,10 @@ export function LecturerList() {
             {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[...Array(6)].map((_, i) => (
-                        <div key={i} className="bg-white rounded-2xl p-6 h-48 shadow-sm border border-slate-100 animate-pulse">
-                            <div className="w-16 h-16 bg-slate-200 rounded-full mb-4" />
-                            <div className="h-4 bg-slate-200 rounded w-3/4 mb-2" />
-                            <div className="h-3 bg-slate-200 rounded w-1/2" />
+                        <div key={i} className="clay-card p-6 h-48 border-none animate-pulse">
+                            <div className="w-16 h-16 bg-blue-100 dark:bg-slate-800 rounded-full mb-4" />
+                            <div className="h-4 bg-blue-100 dark:bg-slate-800 rounded-xl w-3/4 mb-2" />
+                            <div className="h-3 bg-blue-100 dark:bg-slate-800 rounded-xl w-1/2" />
                         </div>
                     ))}
                 </div>
@@ -141,14 +141,14 @@ export function LecturerList() {
                                 <Link
                                     href={`/lecturers/${lecturer.id}`}
                                     key={lecturer.id}
-                                    className="group bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                                    className="group clay-card p-6 border-none hover:-translate-y-1 transition-all duration-300"
                                 >
                                     <div className="flex items-start justify-between mb-4">
                                         {/* Avatar and basic info would go here, simplified as per original code structure */}
                                         <div className="flex flex-col items-end gap-2 w-full">
                                             <div className="flex justify-between w-full">
                                                 {/* Placeholder for where Avatar would be if it was in original source explicitly */}
-                                                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xl">
+                                                <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-xl border-2 border-white dark:border-slate-700 shadow-sm">
                                                     {lecturer.fullName.charAt(0)}
                                                 </div>
 
@@ -160,7 +160,7 @@ export function LecturerList() {
                                                         <input
                                                             type="checkbox"
                                                             id={`compare-${lecturer.id}`}
-                                                            className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                                            className="w-5 h-5 rounded-lg border-2 border-slate-300 text-primary focus:ring-primary/20 transition-all cursor-pointer"
                                                             checked={isInComparison(lecturer.id)}
                                                             onChange={(e) => {
                                                                 if (e.target.checked) {

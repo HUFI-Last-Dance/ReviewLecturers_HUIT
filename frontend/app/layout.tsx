@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Nunito_Sans, Varela_Round } from 'next/font/google';
 import './globals.css';
 import ReactQueryProvider from '@/lib/react-query';
 import { Toaster } from 'sonner';
@@ -10,14 +10,16 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { ComparisonProvider } from '@/contexts/comparison-context';
 import { ComparisonBar } from '@/components/ComparisonBar';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const nunito = Nunito_Sans({
+  variable: '--font-nunito',
   subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const varelaRound = Varela_Round({
+  variable: '--font-varela-round',
   subsets: ['latin'],
+  weight: ['400'],
 });
 
 export const metadata: Metadata = {
@@ -54,7 +56,7 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground transition-colors duration-300`}
+        className={`${nunito.variable} ${varelaRound.variable} font-sans antialiased min-h-screen bg-background text-foreground transition-colors duration-300`}
         suppressHydrationWarning
       >
         <ReactQueryProvider>

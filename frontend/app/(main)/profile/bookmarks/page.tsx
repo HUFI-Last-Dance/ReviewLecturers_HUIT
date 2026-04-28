@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { academicService } from '@/services/academic.service';
 import Link from 'next/link';
 import { BookOpen } from 'lucide-react';
-import { BookmarkButton } from '@/components/BookmarkButton';
+import { BookmarkButton } from '@/components/lecturer/BookmarkButton';
 import { useLanguage } from '@/contexts/language-context';
 
 export default function BookmarksPage() {

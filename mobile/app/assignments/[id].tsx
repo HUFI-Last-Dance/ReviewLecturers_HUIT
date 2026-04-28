@@ -21,6 +21,7 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/contexts';
+import { ReviewCard } from '@/components/ReviewCard';
 import {
     ThumbsUp,
     ThumbsDown,
@@ -75,14 +76,7 @@ export default function AssignmentDetailScreen() {
         voteReviewMutation.mutate({ reviewId, voteType });
     };
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('vi-VN', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-        });
-    };
+
 
     if (isLoading) {
         return (
@@ -103,88 +97,7 @@ export default function AssignmentDetailScreen() {
         );
     }
 
-    const ReviewCard = ({ review }: { review: Review }) => {
-        const netVotes = (review.upvoteCount || 0) - (review.downvoteCount || 0);
 
-        return (
-            <Card variant="outlined" padding="md" style={styles.reviewCard}>
-                {/* Header */}
-                <View style={styles.reviewHeader}>
-                    <Avatar
-                        name={review.isAnonymous ? 'Ẩn danh' : review.author?.fullName}
-                        size="sm"
-                    />
-                    <View style={styles.reviewMeta}>
-                        <Text style={[styles.reviewAuthor, { color: colors.text }]}>
-                            {review.isAnonymous ? 'Ẩn danh' : review.author?.fullName || 'Người dùng'}
-                        </Text>
-                        <View style={styles.reviewDateRow}>
-                            <Calendar size={12} color={colors.textMuted} />
-                            <Text style={[styles.reviewDate, { color: colors.textMuted }]}>
-                                {formatDate(review.createdAt)}
-                            </Text>
-                        </View>
-                    </View>
-                </View>
-
-                {/* Content */}
-                <Text style={[styles.reviewContent, { color: colors.text }]}>
-                    {review.content}
-                </Text>
-
-                {/* Feedback badges */}
-                {(review.feedbackCommunication || review.feedbackKnowledge ||
-                    review.feedbackExpertise || review.feedbackAttitude) && (
-                        <View style={styles.feedbackContainer}>
-                            {review.feedbackCommunication && (
-                                <Badge text={`Giao tiếp: ${review.feedbackCommunication}`} variant="info" />
-                            )}
-                            {review.feedbackKnowledge && (
-                                <Badge text={`Kiến thức: ${review.feedbackKnowledge}`} variant="info" />
-                            )}
-                        </View>
-                    )}
-
-                {/* Actions */}
-                <View style={styles.reviewActions}>
-                    <TouchableOpacity
-                        style={styles.voteAction}
-                        onPress={() => handleVoteReview(review.id, 'UPVOTE')}
-                    >
-                        <ThumbsUp
-                            size={16}
-                            color={review.userVote === 'UPVOTE' ? colors.upvote : colors.textSecondary}
-                        />
-                        <Text style={[styles.voteCount, {
-                            color: review.userVote === 'UPVOTE' ? colors.upvote : colors.textSecondary
-                        }]}>
-                            {review.upvoteCount || 0}
-                        </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.voteAction}
-                        onPress={() => handleVoteReview(review.id, 'DOWNVOTE')}
-                    >
-                        <ThumbsDown
-                            size={16}
-                            color={review.userVote === 'DOWNVOTE' ? colors.downvote : colors.textSecondary}
-                        />
-                        <Text style={[styles.voteCount, {
-                            color: review.userVote === 'DOWNVOTE' ? colors.downvote : colors.textSecondary
-                        }]}>
-                            {review.downvoteCount || 0}
-                        </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.voteAction}>
-                        <MessageSquare size={16} color={colors.textSecondary} />
-                        <Text style={[styles.voteCount, { color: colors.textSecondary }]}>
-                            {review.repliesCount || 0}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            </Card>
-        );
-    };
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['bottom']}>
@@ -241,7 +154,7 @@ export default function AssignmentDetailScreen() {
                             </Card>
                         ) : (
                             reviews.map((review: Review) => (
-                                <ReviewCard key={review.id} review={review} />
+                                <ReviewCard key={review.id} review={review} onVote={handleVoteReview} />
                             ))
                         )}
                     </View>
