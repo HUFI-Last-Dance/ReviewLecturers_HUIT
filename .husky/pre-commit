@@ -1,0 +1,14 @@
+# Chạy Unit Test
+npm run test:all
+
+# Kiểm tra lỗi TypeScript Backend
+echo "🔍 Checking Backend TypeScript..."
+npm run build:backend
+
+# Kiểm tra lỗi TypeScript Frontend
+echo "🔍 Checking Frontend TypeScript..."
+npm run build:frontend
+
+# Kiểm tra lỗi TypeScript Mobile
+echo "🔍 Checking Mobile TypeScript..."
+npm run build:mobile
