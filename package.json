@@ -12,7 +12,11 @@
     "test:all": "npm test --workspaces --if-present",
     "build:all": "npm run build --workspaces --if-present",
     "build:backend": "npm run build --workspace=backend",
-    "build:frontend": "npm run build --workspace=frontend"
+    "build:frontend": "npm run build --workspace=frontend",
+    "build:mobile": "npm run type-check --workspace=mobile",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:mobile": "npm run start --workspace=mobile"
   },
   "devDependencies": {
     "husky": "^9.1.7"

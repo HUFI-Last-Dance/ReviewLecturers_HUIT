@@ -109,7 +109,7 @@ export const getReplyById = async (
     const { id } = req.params;
 
     const reply = await prisma.reviewReply.findUnique({
-        where: { id },
+        where: { id: id as string },
         include: {
             user: {
                 select: {
@@ -183,7 +183,7 @@ export const updateReply = async (
     }
 
     const reply = await prisma.reviewReply.findUnique({
-        where: { id },
+        where: { id: id as string },
     });
 
     if (!reply) {
@@ -195,7 +195,7 @@ export const updateReply = async (
     }
 
     const updated = await prisma.reviewReply.update({
-        where: { id },
+        where: { id: id as string },
         data: { content },
     });
 
@@ -216,7 +216,7 @@ export const deleteReply = async (
     const roles = req.user!.roles;
 
     const reply = await prisma.reviewReply.findUnique({
-        where: { id },
+        where: { id: id as string },
     });
 
     if (!reply) {
@@ -228,7 +228,7 @@ export const deleteReply = async (
     }
 
     await prisma.reviewReply.delete({
-        where: { id },
+        where: { id: id as string },
     });
 
     logger.warn(`Reply ${id} deleted by user ${userId}`);

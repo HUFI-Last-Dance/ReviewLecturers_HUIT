@@ -48,7 +48,7 @@ export const createReview = async (
 
     // Check assignment exists
     const assignment = await prisma.teachingAssignment.findUnique({
-        where: { id: teachingAssignmentId },
+        where: { id: teachingAssignmentId as string },
     });
 
     if (!assignment) {
@@ -59,8 +59,8 @@ export const createReview = async (
     const existingReview = await prisma.review.findUnique({
         where: {
             userId_teachingAssignmentId: {
-                userId,
-                teachingAssignmentId,
+                userId: userId as string,
+                teachingAssignmentId: teachingAssignmentId as string,
             },
         },
     });
@@ -72,8 +72,8 @@ export const createReview = async (
     // Create review
     const review = await prisma.review.create({
         data: {
-            userId,
-            teachingAssignmentId,
+            userId: userId as string,
+            teachingAssignmentId: teachingAssignmentId as string,
             content,
             isAnonymous: isAnonymous || false,
             feedbackCommunication,
@@ -113,7 +113,7 @@ export const createReview = async (
     });
 
     // Update lecturer engagement score
-    updateLecturerEngagementScore(assignment.lecturerId).catch(console.error);
+    updateLecturerEngagementScore(assignment.lecturerId as string).catch(console.error);
 
     logger.success(
         `User ${userId} created review for assignment ${teachingAssignmentId}`
@@ -142,7 +142,7 @@ export const getReviewById = async (
     const { id } = req.params;
 
     const review = await prisma.review.findUnique({
-        where: { id },
+        where: { id: id as string },
         include: {
             user: {
                 select: {
@@ -262,7 +262,7 @@ export const updateReview = async (
 
     // Check ownership
     const review = await prisma.review.findUnique({
-        where: { id },
+        where: { id: id as string },
     });
 
     if (!review) {
@@ -275,7 +275,7 @@ export const updateReview = async (
 
     // Update
     const updated = await prisma.review.update({
-        where: { id },
+        where: { id: id as string },
         data: { content },
     });
 
@@ -296,7 +296,7 @@ export const deleteReview = async (
     const roles = req.user!.roles;
 
     const review = await prisma.review.findUnique({
-        where: { id },
+        where: { id: id as string },
         include: {
             teachingAssignment: {
                 select: { lecturerId: true }
@@ -314,12 +314,12 @@ export const deleteReview = async (
     }
 
     await prisma.review.delete({
-        where: { id },
+        where: { id: id as string },
     });
 
     // Update engagement score
-    if (review.teachingAssignment?.lecturerId) {
-        updateLecturerEngagementScore(review.teachingAssignment.lecturerId).catch(console.error);
+    if ((review as any).teachingAssignment?.lecturerId) {
+        updateLecturerEngagementScore((review as any).teachingAssignment.lecturerId as string).catch(console.error);
     }
 
     logger.warn(`Review ${id} deleted by user ${userId}`);

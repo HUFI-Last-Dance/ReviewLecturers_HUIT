@@ -8,7 +8,7 @@ import { LanguageProvider } from '@/contexts/language-context';
 import { ThemeProvider } from '@/components/theme-provider';
 
 import { ComparisonProvider } from '@/contexts/comparison-context';
-import { ComparisonBar } from '@/components/ComparisonBar';
+import { ComparisonBar } from '@/components/comparison/ComparisonBar';
 
 const nunito = Nunito_Sans({
   variable: '--font-nunito',

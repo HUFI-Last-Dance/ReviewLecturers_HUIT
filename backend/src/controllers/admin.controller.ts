@@ -105,8 +105,8 @@ export const getAllReviews = async (
         content: review.content,
         author: review.user,
         target: {
-            lecturer: review.teachingAssignment.lecturer.fullName,
-            subject: `${review.teachingAssignment.subject.code} - ${review.teachingAssignment.subject.name}`
+            lecturer: (review as any).teachingAssignment.lecturer.fullName,
+            subject: `${(review as any).teachingAssignment.subject.code} - ${(review as any).teachingAssignment.subject.name}`
         },
         stats: {
             upvotes: review.upvoteCount,
@@ -215,7 +215,7 @@ export const getUserById = async (
     const { id } = req.params;
 
     const user = await prisma.user.findUnique({
-        where: { id },
+        where: { id: id as string },
         select: {
             id: true,
             email: true,
@@ -272,7 +272,7 @@ export const assignRole = async (
 
     // Kiểm tra user tồn tại
     const user = await prisma.user.findUnique({
-        where: { id: userId },
+        where: { id: userId as string },
     });
 
     if (!user) {
@@ -291,7 +291,7 @@ export const assignRole = async (
     // Kiểm tra đã có role chưa
     const existingUserRole = await prisma.userRole.findFirst({
         where: {
-            userId,
+            userId: userId as string,
             roleId: role.id,
         },
     });
@@ -303,7 +303,7 @@ export const assignRole = async (
     // Gán role
     await prisma.userRole.create({
         data: {
-            userId,
+            userId: userId as string,
             roleId: role.id,
         },
     });
@@ -324,7 +324,7 @@ export const removeRole = async (
 
     // Tìm role
     const role = await prisma.role.findUnique({
-        where: { name: roleName },
+        where: { name: roleName as string },
     });
 
     if (!role) {
@@ -334,8 +334,8 @@ export const removeRole = async (
     // Tìm user role
     const userRole = await prisma.userRole.findFirst({
         where: {
-            userId,
-            roleId: role.id,
+            userId: userId as string,
+            roleId: (role as any).id,
         },
     });
 
@@ -405,7 +405,7 @@ export const verifyLecturer = async (
 
     // 1. Kiểm tra lecturer tồn tại
     const lecturer = await prisma.lecturer.findUnique({
-        where: { id: lecturerId },
+        where: { id: lecturerId as string },
     });
 
     if (!lecturer) {
@@ -414,7 +414,7 @@ export const verifyLecturer = async (
 
     // 2. Kiểm tra user tồn tại
     const user = await prisma.user.findUnique({
-        where: { id: userId },
+        where: { id: userId as string },
     });
 
     if (!user) {
@@ -424,8 +424,8 @@ export const verifyLecturer = async (
     // 3. Kiểm tra user đã được liên kết với lecturer khác chưa
     const existingLecturer = await prisma.lecturer.findFirst({
         where: {
-            userId,
-            id: { not: lecturerId }, // Không tính lecturer hiện tại
+            userId: userId as string,
+            id: { not: lecturerId as string }, // Không tính lecturer hiện tại
         },
     });
 
@@ -435,9 +435,9 @@ export const verifyLecturer = async (
 
     // 4. Liên kết user với lecturer
     await prisma.lecturer.update({
-        where: { id: lecturerId },
+        where: { id: lecturerId as string },
         data: {
-            userId,
+            userId: userId as string,
         },
     });
 
@@ -449,7 +449,7 @@ export const verifyLecturer = async (
     if (lecturerRole) {
         const existingUserRole = await prisma.userRole.findFirst({
             where: {
-                userId,
+                userId: userId as string,
                 roleId: lecturerRole.id,
             },
         });
@@ -457,7 +457,7 @@ export const verifyLecturer = async (
         if (!existingUserRole) {
             await prisma.userRole.create({
                 data: {
-                    userId,
+                    userId: userId as string,
                     roleId: lecturerRole.id,
                 },
             });
@@ -481,7 +481,7 @@ export const unverifyLecturer = async (
     const { lecturerId } = req.params;
 
     const lecturer = await prisma.lecturer.findUnique({
-        where: { id: lecturerId },
+        where: { id: lecturerId as string },
     });
 
     if (!lecturer) {
@@ -490,7 +490,7 @@ export const unverifyLecturer = async (
 
     // Hủy liên kết
     await prisma.lecturer.update({
-        where: { id: lecturerId },
+        where: { id: lecturerId as string },
         data: {
             userId: null,
         },

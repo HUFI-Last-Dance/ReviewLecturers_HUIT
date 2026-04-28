@@ -31,7 +31,7 @@ export const voteReview = async (
 
     // Check review exists
     const review = await prisma.review.findUnique({
-        where: { id: reviewId },
+        where: { id: reviewId as string },
         include: {
             teachingAssignment: {
                 select: { lecturerId: true }
@@ -47,8 +47,8 @@ export const voteReview = async (
     const existingVote = await prisma.reviewVote.findUnique({
         where: {
             userId_reviewId: {
-                userId,
-                reviewId,
+                userId: userId as string,
+                reviewId: reviewId as string,
             },
         },
     });
@@ -74,8 +74,8 @@ export const voteReview = async (
         // Chưa vote → Tạo mới
         await prisma.reviewVote.create({
             data: {
-                userId,
-                reviewId,
+                userId: userId as string,
+                reviewId: reviewId as string,
                 voteType,
             },
         });
@@ -84,16 +84,16 @@ export const voteReview = async (
     // Recalculate vote counts
     const [upvotes, downvotes] = await Promise.all([
         prisma.reviewVote.count({
-            where: { reviewId, voteType: 'UPVOTE' },
+            where: { reviewId: reviewId as string, voteType: 'UPVOTE' },
         }),
         prisma.reviewVote.count({
-            where: { reviewId, voteType: 'DOWNVOTE' },
+            where: { reviewId: reviewId as string, voteType: 'DOWNVOTE' },
         }),
     ]);
 
     // Update review counts
     await prisma.review.update({
-        where: { id: reviewId },
+        where: { id: reviewId as string },
         data: {
             upvoteCount: upvotes,
             downvoteCount: downvotes,
@@ -101,8 +101,8 @@ export const voteReview = async (
     });
 
     // Update lecturer engagement score
-    if (review.teachingAssignment?.lecturerId) {
-        updateLecturerEngagementScore(review.teachingAssignment.lecturerId).catch(console.error);
+    if ((review as any).teachingAssignment?.lecturerId) {
+        updateLecturerEngagementScore((review as any).teachingAssignment.lecturerId as string).catch(console.error);
     }
 
     logger.info(`User ${userId} ${action} ${voteType} on review ${reviewId}`);
@@ -137,7 +137,7 @@ export const voteReply = async (
     }
 
     const reply = await prisma.reviewReply.findUnique({
-        where: { id: replyId },
+        where: { id: replyId as string },
     });
 
     if (!reply) {
@@ -148,7 +148,7 @@ export const voteReply = async (
         where: {
             userId_replyId: {
                 userId,
-                replyId,
+                replyId: replyId as string,
             },
         },
     });
@@ -171,8 +171,8 @@ export const voteReply = async (
     } else {
         await prisma.replyVote.create({
             data: {
-                userId,
-                replyId,
+                userId: userId as string,
+                replyId: replyId as string,
                 voteType,
             },
         });
@@ -181,15 +181,15 @@ export const voteReply = async (
     // Recalculate
     const [upvotes, downvotes] = await Promise.all([
         prisma.replyVote.count({
-            where: { replyId, voteType: 'UPVOTE' },
+            where: { replyId: replyId as string, voteType: 'UPVOTE' },
         }),
         prisma.replyVote.count({
-            where: { replyId, voteType: 'DOWNVOTE' },
+            where: { replyId: replyId as string, voteType: 'DOWNVOTE' },
         }),
     ]);
 
     await prisma.reviewReply.update({
-        where: { id: replyId },
+        where: { id: replyId as string },
         data: {
             upvoteCount: upvotes,
             downvoteCount: downvotes,
@@ -224,7 +224,7 @@ export const getMyReviewVote = async (
         where: {
             userId_reviewId: {
                 userId,
-                reviewId,
+                reviewId: reviewId as string,
             },
         },
     });
@@ -253,7 +253,7 @@ export const getMyReplyVote = async (
         where: {
             userId_replyId: {
                 userId,
-                replyId,
+                replyId: replyId as string,
             },
         },
     });

@@ -58,7 +58,7 @@ export default function HomeScreen() {
   }, []);
 
   const goToComparison = () => {
-    router.push('/comparison');
+    router.push('/comparison' as any);
   };
 
   const renderItem = useCallback(({ item }: { item: Lecturer }) => (

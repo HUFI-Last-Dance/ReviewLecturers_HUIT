@@ -128,7 +128,7 @@ export const getAssignmentById = async (
     } catch (e) { }
 
     const assignment = await prisma.teachingAssignment.findUnique({
-        where: { id },
+        where: { id: id as string },
         select: {
             id: true,
             classCode: true,
@@ -185,7 +185,7 @@ export const getAssignmentById = async (
                     votes: userId ? {
                         where: { userId: userId },
                         select: { voteType: true }
-                    } : false,
+                    } : undefined,
                     _count: {
                         select: {
                             replies: true,

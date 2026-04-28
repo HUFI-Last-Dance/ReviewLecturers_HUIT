@@ -99,7 +99,7 @@ export const getAllLecturers = async (
     if (userId) {
         const bookmarks = await prisma.lecturerBookmark.findMany({
             where: {
-                userId,
+                userId: userId as string,
                 lecturerId: { in: lecturers.map(l => l.id) }
             },
             select: { lecturerId: true }
@@ -164,7 +164,7 @@ export const getLecturerById = async (
     }
 
     const lecturer = await prisma.lecturer.findUnique({
-        where: { id },
+        where: { id: id as string },
         select: {
             id: true,
             fullName: true,
@@ -234,16 +234,16 @@ export const getLecturerById = async (
             prisma.lecturerVote.findUnique({
                 where: {
                     userId_lecturerId: {
-                        userId: userId,
-                        lecturerId: id,
+                        userId: userId as string,
+                        lecturerId: id as string,
                     },
                 },
             }),
             prisma.lecturerBookmark.findUnique({
                 where: {
                     userId_lecturerId: {
-                        userId: userId,
-                        lecturerId: id,
+                        userId: userId as string,
+                        lecturerId: id as string,
                     },
                 },
             })
@@ -323,7 +323,7 @@ export const voteLecturer = async (
 
     // 1. Check lecturer exist
     const lecturer = await prisma.lecturer.findUnique({
-        where: { id: lecturerId },
+        where: { id: lecturerId as string },
     });
 
     if (!lecturer) {
@@ -334,8 +334,8 @@ export const voteLecturer = async (
     const existingVote = await prisma.lecturerVote.findUnique({
         where: {
             userId_lecturerId: {
-                userId,
-                lecturerId,
+                userId: userId as string,
+                lecturerId: lecturerId as string,
             },
         },
     });
@@ -349,7 +349,7 @@ export const voteLecturer = async (
                 });
                 // Giảm count
                 await tx.lecturer.update({
-                    where: { id: lecturerId },
+                    where: { id: lecturerId as string },
                     data: {
                         [voteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
                             decrement: 1,
@@ -357,7 +357,7 @@ export const voteLecturer = async (
                     },
                 });
                 await prisma.lecturer.update({
-                    where: { id: lecturerId },
+                    where: { id: lecturerId as string },
                     data: {
                         [voteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
                             decrement: 1,
@@ -367,7 +367,7 @@ export const voteLecturer = async (
             });
 
             // Update engagement score (async, non-blocking)
-            updateLecturerEngagementScore(lecturerId).catch(console.error);
+            updateLecturerEngagementScore(lecturerId as string).catch(console.error);
 
             sendSuccess(res, { voted: false, voteType: null }, 'Đã hủy vote');
         } else {
@@ -380,7 +380,7 @@ export const voteLecturer = async (
                 // Update counts
                 const oldVoteType = existingVote.voteType;
                 await tx.lecturer.update({
-                    where: { id: lecturerId },
+                    where: { id: lecturerId as string },
                     data: {
                         [oldVoteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
                             decrement: 1,
@@ -393,7 +393,7 @@ export const voteLecturer = async (
             });
 
             // Update engagement score
-            updateLecturerEngagementScore(lecturerId).catch(console.error);
+            updateLecturerEngagementScore(lecturerId as string).catch(console.error);
 
             sendSuccess(res, { voted: true, voteType }, 'Đã thay đổi vote thành công');
         }
@@ -402,14 +402,14 @@ export const voteLecturer = async (
         await prisma.$transaction(async (tx) => {
             await tx.lecturerVote.create({
                 data: {
-                    userId,
-                    lecturerId,
+                    userId: userId as string,
+                    lecturerId: lecturerId as string,
                     voteType,
                 },
             });
             // Tăng count
             await tx.lecturer.update({
-                where: { id: lecturerId },
+                where: { id: lecturerId as string },
                 data: {
                     [voteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
                         increment: 1,
@@ -419,7 +419,7 @@ export const voteLecturer = async (
         });
 
         // Update engagement score
-        updateLecturerEngagementScore(lecturerId).catch(console.error);
+        updateLecturerEngagementScore(lecturerId as string).catch(console.error);
 
         sendSuccess(res, { voted: true, voteType }, 'Vote thành công');
     }

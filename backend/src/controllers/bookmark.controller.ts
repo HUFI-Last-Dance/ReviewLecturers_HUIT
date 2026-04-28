@@ -22,7 +22,7 @@ export const toggleBookmark = async (
 
     // 1. Check lecturer exist
     const lecturer = await prisma.lecturer.findUnique({
-        where: { id: lecturerId },
+        where: { id: lecturerId as string },
     });
 
     if (!lecturer) {
@@ -34,7 +34,7 @@ export const toggleBookmark = async (
         where: {
             userId_lecturerId: {
                 userId,
-                lecturerId,
+                lecturerId: lecturerId as string,
             },
         },
     });
@@ -51,7 +51,7 @@ export const toggleBookmark = async (
         await prisma.lecturerBookmark.create({
             data: {
                 userId,
-                lecturerId,
+                lecturerId: lecturerId as string,
             },
         });
 

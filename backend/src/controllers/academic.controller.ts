@@ -71,7 +71,7 @@ export const getSubjectById = async (
     const { id } = req.params;
 
     const subject = await prisma.subject.findUnique({
-        where: { id },
+        where: { id: id as string },
         include: {
             teachingAssignments: {
                 select: {
@@ -172,7 +172,7 @@ export const getTermById = async (
     const { id } = req.params;
 
     const term = await prisma.academicTerm.findUnique({
-        where: { id },
+        where: { id: id as string },
         include: {
             teachingAssignments: {
                 select: {
