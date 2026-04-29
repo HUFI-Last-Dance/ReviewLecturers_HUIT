@@ -46,11 +46,11 @@ yarn-error.log*
 /backend/prisma/migrations
 
 # Agent & AI configs
-.agent/
-.codex/
-.gemini/
-.claude/
-.cursor/
+!.agent/
+!.codex/
+!.gemini/
+!.claude/
+!.cursor/
 .cursorrules
 .windsurf/
 .windsurfrules

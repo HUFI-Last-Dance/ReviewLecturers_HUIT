@@ -1,0 +1,14 @@
+echo "Running full quality checks before pushing..."
+
+# 1. Global Type Check
+npm run type-check:all
+
+# 2. Secret scan before publishing commits
+if ! command -v gitleaks > /dev/null; then
+  echo "Warning: gitleaks is not installed; skipping secret scan."
+else
+  gitleaks detect --source . --redact --exit-code 1
+fi
+
+# 3. Run all tests
+npm run test:all
