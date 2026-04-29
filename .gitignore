@@ -1,21 +1,19 @@
 # Dependencies
 node_modules
 .pnpm-store
+# Dependencies
+node_modules
+.pnpm-store
 .code-review-graph
 # Testing
 coverage
 .*
 !.husky/
 !.github/
+!.codex/
 !backend/.eslintrc.json
 !backend/.eslintignore
 !mobile/.eslintrc.json
-# Next.js
-.next/
-out/
-
-.cursorrules
-.windsurfrules
 .kiro/steering/code-review-graph.md
 .claude/skills
 .claude/settings.json
