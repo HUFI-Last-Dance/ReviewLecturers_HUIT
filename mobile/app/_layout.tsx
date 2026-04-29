@@ -98,6 +98,13 @@ function RootLayoutNav() {
                   presentation: 'modal',
                 }}
               />
+              <Stack.Screen
+                name="comparison"
+                options={{
+                  headerShown: false,
+                  presentation: 'fullScreenModal',
+                }}
+              />
             </Stack>
           </ThemeProvider>
         </ComparisonProvider>

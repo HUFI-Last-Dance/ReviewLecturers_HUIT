@@ -1,115 +1,176 @@
 export interface Lecturer {
-    id: string;
-    fullName: string;
-    staffId?: string;
-    email?: string;
-    degree?: {
-        code: string;
-        name: string;
-    };
-    avatar?: string;
-    upvoteCount?: number;
-    downvoteCount?: number;
-    myVote?: 'UPVOTE' | 'DOWNVOTE' | null;
-    assignmentsCount?: number;
-    reviewsCount?: number;
-    engagementScore?: number;
-    _count?: {
-        teachingAssignments: number;
-        reviews: number;
-    };
-    isBookmarked?: boolean;
+  id: string;
+  fullName: string;
+  staffId?: string;
+  email?: string;
+  department?: string;
+  degree?: {
+    code: string;
+    name: string;
+  };
+  avatar?: string;
+  upvoteCount?: number;
+  downvoteCount?: number;
+  myVote?: 'UPVOTE' | 'DOWNVOTE' | null;
+  assignmentsCount?: number;
+  reviewsCount?: number;
+  engagementScore?: number;
+  _count?: {
+    teachingAssignments: number;
+    reviews: number;
+  };
+  isBookmarked?: boolean;
 }
 
 export interface Subject {
-    id: string;
-    code: string;
-    name: string;
-    credits: number;
+  id: string;
+  code: string;
+  name: string;
+  credits: number;
 }
 
 export interface AcademicTerm {
-    id: string;
-    name: string;
-    year?: string;
-    startDate?: string;
-    endDate?: string;
+  id: string;
+  name: string;
+  year?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface AcademicTermsResponse {
+  success?: boolean;
+  data: AcademicTerm[];
 }
 
 export interface Campus {
-    id: string;
-    name: string;
-    address?: string;
+  id: string;
+  name: string;
+  address?: string;
 }
 
 export interface Review {
-    id: string;
-    content: string;
-    isAnonymous: boolean;
-    author: { id: string; fullName: string; roles?: string[] } | null;
-    upvoteCount: number;
-    downvoteCount: number;
-    repliesCount: number;
-    createdAt: string;
-    userVote?: 'UPVOTE' | 'DOWNVOTE' | null; // From API
-    replies?: Reply[];
-    feedbackCommunication?: string;
-    feedbackKnowledge?: string;
-    feedbackExpertise?: string;
-    feedbackAttitude?: string;
+  id: string;
+  content: string;
+  isAnonymous: boolean;
+  author: { id: string; fullName: string; roles?: string[] } | null;
+  upvoteCount: number;
+  downvoteCount: number;
+  repliesCount: number;
+  createdAt: string;
+  userVote?: 'UPVOTE' | 'DOWNVOTE' | null; // From API
+  replies?: Reply[];
+  feedbackCommunication?: string;
+  feedbackKnowledge?: string;
+  feedbackExpertise?: string;
+  feedbackAttitude?: string;
+  teachingAssignmentId?: string;
+  teachingAssignment?: {
+    lecturer: { fullName: string };
+    subject: { name: string };
+    term: { name: string };
+  };
 }
 
 export interface Reply {
-    id: string;
-    content: string;
-    user: { id: string; fullName: string; roles?: string[] }; // Reply always has user connected or logic
-    isAnonymous: boolean;
-    upvoteCount: number;
-    downvoteCount: number;
-    replies?: Reply[]; // Recursively nested
-    createdAt: string;
-    myVote?: 'UPVOTE' | 'DOWNVOTE' | null;
+  id: string;
+  content: string;
+  user: { id: string; fullName: string; roles?: string[] }; // Reply always has user connected or logic
+  isAnonymous: boolean;
+  upvoteCount: number;
+  downvoteCount: number;
+  replies?: Reply[]; // Recursively nested
+  createdAt: string;
+  myVote?: 'UPVOTE' | 'DOWNVOTE' | null;
 }
 
 export interface TeachingAssignment {
-    id: string;
-    lecturerId: string;
-    subjectId: string;
-    termId: string;
-    classCode?: string;
-    campus?: Campus;
-    lecturer: Lecturer;
-    subject: Subject;
-    term: AcademicTerm;
-    reviewsCount?: number;
+  id: string;
+  lecturerId: string;
+  subjectId: string;
+  termId: string;
+  createdAt?: string;
+  classCode?: string;
+  campus?: Campus;
+  lecturer: Lecturer;
+  subject: Subject;
+  term: AcademicTerm;
+  reviewsCount?: number;
 }
 
 // Chi tiết Assignment bao gồm Reviews
 export interface TeachingAssignmentDetail extends TeachingAssignment {
-    reviews: Review[];
+  reviews: Review[];
 }
 
 export interface LecturerListResponse {
-    success: boolean;
-    data: {
-        lecturers: Lecturer[];
-        pagination: {
-            page: number;
-            limit: number;
-            total: number;
-            totalPages: number;
-        };
+  success: boolean;
+  data: {
+    lecturers: Lecturer[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
     };
+  };
 }
 
 export interface LecturerDetailResponse {
-    success: boolean;
-    data: Lecturer & {
-        teachingAssignments: TeachingAssignment[];
-    };
+  success: boolean;
+  data: Lecturer & {
+    teachingAssignments: TeachingAssignment[];
+  };
 }
 
 export interface AssignmentDetailResponse {
-    success: boolean;
-    data: TeachingAssignmentDetail;
+  success: boolean;
+  data: TeachingAssignmentDetail;
+}
+
+export interface BaseResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface RecentReview extends Review {
+  user?: { id: string; fullName: string; roles?: string[] } | null;
+  teachingAssignmentId: string;
+  teachingAssignment: {
+    lecturer: { fullName: string };
+    subject: { name: string };
+    term: { name: string };
+  };
+  _count: {
+    votes: number;
+    replies?: number;
+  };
+}
+
+export interface RecentReviewsResponse {
+  success?: boolean;
+  data: RecentReview[];
+}
+
+export interface MyReviewsResponse {
+  success?: boolean;
+  data: {
+    reviews: RecentReview[];
+    metadata?: {
+      total?: number;
+    };
+  };
+}
+
+export interface ReviewDetailResponse {
+  success?: boolean;
+  data: Review;
+}
+
+export interface VoteResponse {
+  success?: boolean;
+  data: {
+    upvoteCount: number;
+    downvoteCount: number;
+    action?: 'created' | 'updated' | 'deleted';
+  };
 }

@@ -12,9 +12,9 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
  * Generate JWT Access Token
  */
 export const generateAccessToken = (payload: JwtPayload): string => {
-    return jwt.sign(payload, JWT_SECRET, {
-        expiresIn: JWT_EXPIRES_IN,
-    } as jwt.SignOptions);
+  return jwt.sign(payload, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN,
+  } as jwt.SignOptions);
 };
 
 /**
@@ -22,18 +22,19 @@ export const generateAccessToken = (payload: JwtPayload): string => {
  * @throws Error nếu token invalid hoặc expired
  */
 export const verifyToken = (token: string): JwtPayload => {
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
-        return decoded;
-    } catch (error: any) {
-        if (error.name === 'TokenExpiredError') {
-            throw new Error('Token đã hết hạn');
-        } else if (error.name === 'JsonWebTokenError') {
-            throw new Error('Token không hợp lệ');
-        } else {
-            throw new Error('Lỗi xác thực token');
-        }
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    return decoded;
+  } catch (error: unknown) {
+    const err = error as Error;
+    if (err.name === 'TokenExpiredError') {
+      throw new Error('Token đã hết hạn');
+    } else if (err.name === 'JsonWebTokenError') {
+      throw new Error('Token không hợp lệ');
+    } else {
+      throw new Error('Lỗi xác thực token');
     }
+  }
 };
 
 /**
@@ -41,11 +42,11 @@ export const verifyToken = (token: string): JwtPayload => {
  * Dùng để debug hoặc lấy thông tin khi không cần verify
  */
 export const decodeToken = (token: string): JwtPayload | null => {
-    try {
-        return jwt.decode(token) as JwtPayload;
-    } catch {
-        return null;
-    }
+  try {
+    return jwt.decode(token) as JwtPayload;
+  } catch {
+    return null;
+  }
 };
 
 // ========================================

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Home, User, Bookmark } from 'lucide-react-native';
 
@@ -47,11 +46,7 @@ export default function TabLayout() {
         options={{
           title: 'Trang chủ',
           tabBarIcon: ({ color, focused }) => (
-            <Home
-              size={24}
-              color={color}
-              strokeWidth={focused ? 2.5 : 2}
-            />
+            <Home size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
           ),
         }}
       />
@@ -60,11 +55,7 @@ export default function TabLayout() {
         options={{
           title: 'Đã lưu',
           tabBarIcon: ({ color, focused }) => (
-            <Bookmark
-              size={24}
-              color={color}
-              strokeWidth={focused ? 2.5 : 2}
-            />
+            <Bookmark size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
           ),
         }}
       />
@@ -73,11 +64,7 @@ export default function TabLayout() {
         options={{
           title: 'Cá nhân',
           tabBarIcon: ({ color, focused }) => (
-            <User
-              size={24}
-              color={color}
-              strokeWidth={focused ? 2.5 : 2}
-            />
+            <User size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
           ),
         }}
       />

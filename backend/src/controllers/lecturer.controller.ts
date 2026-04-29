@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
+import { Prisma } from '@prisma/client';
 import prisma from '../config/database';
 import { AppError } from '../middleware/errorHandler';
 import { sendSuccess } from '../utils/response';
 import { removeVietnameseDiacritics } from '../utils/vietnamese';
 import { updateLecturerEngagementScore } from '../utils/score';
+import { verifyToken } from '../utils/jwt';
 
 // ========================================
 // 👨‍🏫 LECTURER API (Public - Không cần auth)
@@ -13,286 +15,283 @@ import { updateLecturerEngagementScore } from '../utils/score';
  * GET /api/lecturers
  * Lấy danh sách giảng viên (có pagination, filter)
  */
-export const getAllLecturers = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
-    const skip = (page - 1) * limit;
-    const sort = (req.query.sort as string) || 'engagement'; // Default sort by engagement
-    const search = req.query.search as string;
-    const degreeCode = req.query.degreeCode as string; // Filter by degree
+export const getAllLecturers = async (req: Request, res: Response): Promise<void> => {
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 20;
+  const skip = (page - 1) * limit;
+  const sort = (req.query.sort as string) || 'engagement'; // Default sort by engagement
+  const search = req.query.search as string;
+  const degreeCode = req.query.degreeCode as string; // Filter by degree
 
-    // Build where clause
-    const where: any = {};
+  // Build where clause
+  const where: Prisma.LecturerWhereInput = {};
 
-    // Filter by degree code
-    if (degreeCode && degreeCode.trim()) {
-        where.degree = { code: degreeCode.trim() };
+  // Filter by degree code
+  if (degreeCode && degreeCode.trim()) {
+    where.degree = { code: degreeCode.trim() };
+  }
+
+  // Filter by search term (name)
+  if (search && search.trim()) {
+    // Search by cleanName (optimization) OR original fullName
+    const searchClean = removeVietnameseDiacritics(search.trim().toLowerCase());
+    where.OR = [
+      { cleanName: { contains: searchClean } },
+      { fullName: { contains: search.trim(), mode: 'insensitive' } },
+    ];
+  }
+
+  // Determine sort order
+  let orderBy: Prisma.LecturerOrderByWithRelationInput = {};
+  if (sort === 'engagement') {
+    orderBy = { engagementScore: 'desc' };
+  } else {
+    orderBy = { fullName: 'asc' };
+  }
+
+  // Check user auth for bookmark status
+  let userId: string | null = null;
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    try {
+      const token = authHeader.substring(7);
+      const payload = verifyToken(token);
+      userId = payload.userId;
+    } catch {
+      // Ignore invalid token
     }
+  }
 
-    // Filter by search term (name)
-    if (search && search.trim()) {
-        // Search by cleanName (optimization) OR original fullName
-        const searchClean = removeVietnameseDiacritics(search.trim().toLowerCase());
-        where.OR = [
-            { cleanName: { contains: searchClean } },
-            { fullName: { contains: search.trim(), mode: 'insensitive' } }
-        ];
-    }
-
-    // Determine sort order
-    let orderBy: any = {};
-    if (sort === 'engagement') {
-        orderBy = { engagementScore: 'desc' };
-    } else {
-        orderBy = { fullName: 'asc' };
-    }
-
-    // Check user auth for bookmark status
-    let userId: string | null = null;
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-        try {
-            const token = authHeader.substring(7);
-            const jwt = require('jsonwebtoken'); // Lazy load
-            const payload = jwt.verify(token, process.env.JWT_SECRET);
-            userId = payload.userId;
-        } catch (e) { } // Ignore invalid token
-    }
-
-    const [lecturers, total] = await Promise.all([
-        prisma.lecturer.findMany({
-            where,
-            skip,
-            take: limit,
-            orderBy,
-            select: {
-                id: true,
-                fullName: true,
-                staffId: true,
-                cleanName: true,
-                engagementScore: true,
-                totalReviews: true,
-                totalReviewVotes: true,
-                upvoteCount: true,
-                downvoteCount: true,
-                degree: {
-                    select: {
-                        code: true,
-                        name: true,
-                    },
-                },
-                _count: {
-                    select: {
-                        teachingAssignments: true,
-                    },
-                },
-            },
-        }),
-        prisma.lecturer.count({ where }),
-    ]);
-
-    // Get bookmarks if user is logged in
-    let bookmarkedLecturerIds = new Set<string>();
-    if (userId) {
-        const bookmarks = await prisma.lecturerBookmark.findMany({
-            where: {
-                userId: userId as string,
-                lecturerId: { in: lecturers.map(l => l.id) }
-            },
-            select: { lecturerId: true }
-        });
-        bookmarkedLecturerIds = new Set(bookmarks.map(b => b.lecturerId));
-    }
-
-    // Map data structure for response
-    const mappedLecturers = lecturers.map((lecturer) => {
-        return {
-            id: lecturer.id,
-            fullName: lecturer.fullName,
-            staffId: lecturer.staffId,
-            degree: lecturer.degree?.name || null,
-            degreeCode: lecturer.degree?.code || null,
-            upvoteCount: lecturer.upvoteCount,
-            downvoteCount: lecturer.downvoteCount,
-            totalVotes: lecturer.upvoteCount + lecturer.downvoteCount,
-            assignmentsCount: lecturer._count.teachingAssignments,
-            reviewsCount: lecturer.totalReviews,
-            totalReviewVotes: lecturer.totalReviewVotes,
-            engagementScore: lecturer.engagementScore,
-            isBookmarked: bookmarkedLecturerIds.has(lecturer.id), // <--- Added
-        };
-    });
-
-    const response = {
-        lecturers: mappedLecturers,
-        pagination: {
-            page,
-            limit,
-            total,
-            totalPages: Math.ceil(total / limit),
+  const [lecturers, total] = await Promise.all([
+    prisma.lecturer.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy,
+      select: {
+        id: true,
+        fullName: true,
+        staffId: true,
+        cleanName: true,
+        engagementScore: true,
+        totalReviews: true,
+        totalReviewVotes: true,
+        upvoteCount: true,
+        downvoteCount: true,
+        degree: {
+          select: {
+            code: true,
+            name: true,
+          },
         },
-    };
+        _count: {
+          select: {
+            teachingAssignments: true,
+          },
+        },
+      },
+    }),
+    prisma.lecturer.count({ where }),
+  ]);
 
-    sendSuccess(res, response, 'Lấy danh sách giảng viên thành công');
+  // Get bookmarks if user is logged in
+  let bookmarkedLecturerIds = new Set<string>();
+  if (userId) {
+    const bookmarks = await prisma.lecturerBookmark.findMany({
+      where: {
+        userId: userId as string,
+        lecturerId: { in: lecturers.map((l) => l.id) },
+      },
+      select: { lecturerId: true },
+    });
+    bookmarkedLecturerIds = new Set(bookmarks.map((b) => b.lecturerId));
+  }
+
+  // Map data structure for response
+  const mappedLecturers = lecturers.map((lecturer) => {
+    return {
+      id: lecturer.id,
+      fullName: lecturer.fullName,
+      staffId: lecturer.staffId,
+      degree: lecturer.degree?.name || null,
+      degreeCode: lecturer.degree?.code || null,
+      upvoteCount: lecturer.upvoteCount,
+      downvoteCount: lecturer.downvoteCount,
+      totalVotes: lecturer.upvoteCount + lecturer.downvoteCount,
+      assignmentsCount: lecturer._count.teachingAssignments,
+      reviewsCount: lecturer.totalReviews,
+      totalReviewVotes: lecturer.totalReviewVotes,
+      engagementScore: lecturer.engagementScore,
+      isBookmarked: bookmarkedLecturerIds.has(lecturer.id), // <--- Added
+    };
+  });
+
+  const response = {
+    lecturers: mappedLecturers,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+
+  sendSuccess(res, response, 'Lấy danh sách giảng viên thành công');
 };
 
 /**
  * GET /api/lecturers/:id
  * Lấy chi tiết giảng viên
  */
-export const getLecturerById = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
-    const { id } = req.params;
+export const getLecturerById = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
 
-    // Check if user is authenticated (optional - for myVote)
-    let userId: string | null = null;
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-        try {
-            const token = authHeader.substring(7);
-            const jwt = require('jsonwebtoken');
-            const payload = jwt.verify(token, process.env.JWT_SECRET);
-            userId = payload.userId;
-        } catch (e) {
-            // Token invalid, ignore - user not authenticated
-        }
+  // Check if user is authenticated (optional - for myVote)
+  let userId: string | null = null;
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    try {
+      const token = authHeader.substring(7);
+      const payload = verifyToken(token);
+      userId = payload.userId;
+    } catch {
+      // Token invalid, ignore - user not authenticated
     }
+  }
 
-    const lecturer = await prisma.lecturer.findUnique({
-        where: { id: id as string },
+  const lecturer = await prisma.lecturer.findUnique({
+    where: { id: id as string },
+    select: {
+      id: true,
+      fullName: true,
+      staffId: true,
+      upvoteCount: true,
+      downvoteCount: true,
+      email: true,
+      createdAt: true,
+      degree: {
         select: {
-            id: true,
-            fullName: true,
-            staffId: true,
-            upvoteCount: true,
-            downvoteCount: true,
-            email: true,
-            createdAt: true,
-            degree: {
-                select: {
-                    code: true,
-                    name: true,
-                },
-            },
-            teachingAssignments: {
-                select: {
-                    id: true,
-                    classCode: true,
-                    createdAt: true,
-                    subject: {
-                        select: {
-                            id: true,
-                            code: true,
-                            name: true,
-                        },
-                    },
-                    term: {
-                        select: {
-                            id: true,
-                            name: true,
-                        },
-                    },
-                    _count: {
-                        select: {
-                            reviews: true,
-                        },
-                    },
-                    reviews: {
-                        select: {
-                            upvoteCount: true,
-                            downvoteCount: true,
-                            _count: {
-                                select: {
-                                    replies: true
-                                }
-                            }
-                        },
-                    },
-                },
-                orderBy: {
-                    createdAt: 'desc',
-                },
-            },
+          code: true,
+          name: true,
         },
-    });
-
-    if (!lecturer) {
-        throw new AppError('Giảng viên không tồn tại', 404);
-    }
-
-    // Get user's vote & bookmark if authenticated
-    let myVote: 'UPVOTE' | 'DOWNVOTE' | null = null;
-    let isBookmarked = false;
-
-    if (userId) {
-        const [vote, bookmark] = await Promise.all([
-            prisma.lecturerVote.findUnique({
-                where: {
-                    userId_lecturerId: {
-                        userId: userId as string,
-                        lecturerId: id as string,
-                    },
+      },
+      teachingAssignments: {
+        select: {
+          id: true,
+          classCode: true,
+          createdAt: true,
+          subject: {
+            select: {
+              id: true,
+              code: true,
+              name: true,
+            },
+          },
+          term: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          _count: {
+            select: {
+              reviews: true,
+            },
+          },
+          reviews: {
+            select: {
+              upvoteCount: true,
+              downvoteCount: true,
+              _count: {
+                select: {
+                  replies: true,
                 },
-            }),
-            prisma.lecturerBookmark.findUnique({
-                where: {
-                    userId_lecturerId: {
-                        userId: userId as string,
-                        lecturerId: id as string,
-                    },
-                },
-            })
-        ]);
+              },
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
+    },
+  });
 
-        if (vote) {
-            myVote = vote.voteType as 'UPVOTE' | 'DOWNVOTE';
-        }
-        if (bookmark) {
-            isBookmarked = true;
-        }
+  if (!lecturer) {
+    throw new AppError('Giảng viên không tồn tại', 404);
+  }
+
+  // Get user's vote & bookmark if authenticated
+  let myVote: 'UPVOTE' | 'DOWNVOTE' | null = null;
+  let isBookmarked = false;
+
+  if (userId) {
+    const [vote, bookmark] = await Promise.all([
+      prisma.lecturerVote.findUnique({
+        where: {
+          userId_lecturerId: {
+            userId: userId as string,
+            lecturerId: id as string,
+          },
+        },
+      }),
+      prisma.lecturerBookmark.findUnique({
+        where: {
+          userId_lecturerId: {
+            userId: userId as string,
+            lecturerId: id as string,
+          },
+        },
+      }),
+    ]);
+
+    if (vote) {
+      myVote = vote.voteType as 'UPVOTE' | 'DOWNVOTE';
     }
+    if (bookmark) {
+      isBookmarked = true;
+    }
+  }
 
-    // Calculate engagement score
-    let reviewsCount = 0;
-    let totalReviewVotes = 0;
+  // Calculate engagement score
+  let reviewsCount = 0;
+  let totalReviewVotes = 0;
 
-    lecturer.teachingAssignments.forEach((ta: any) => {
-        reviewsCount += ta._count.reviews; // This only counts root reviews for now, we might want to update this logic if engagement score needs to include replies too
-        if (ta.reviews) {
-            ta.reviews.forEach((r: any) => {
-                totalReviewVotes += (r.upvoteCount || 0) + (r.downvoteCount || 0);
-            });
-        }
-    });
+  lecturer.teachingAssignments.forEach((ta) => {
+    reviewsCount += ta._count.reviews; // This only counts root reviews for now, we might want to update this logic if engagement score needs to include replies too
+    if (ta.reviews) {
+      ta.reviews.forEach((r) => {
+        totalReviewVotes += (r.upvoteCount || 0) + (r.downvoteCount || 0);
+      });
+    }
+  });
 
-    const lecturerVotes = (lecturer.upvoteCount || 0) + (lecturer.downvoteCount || 0);
-    const engagementScore = (lecturerVotes * 2) + totalReviewVotes + reviewsCount;
+  const lecturerVotes = (lecturer.upvoteCount || 0) + (lecturer.downvoteCount || 0);
+  const engagementScore = lecturerVotes * 2 + totalReviewVotes + reviewsCount;
 
-    const response = {
-        ...lecturer,
-        myVote,
-        isBookmarked, // <--- Added
-        engagementScore,
-        teachingAssignments: lecturer.teachingAssignments.map((ta) => {
-            const rootReviews = ta._count.reviews;
-            const replies = ta.reviews.reduce((acc: number, curr: any) => acc + (curr._count?.replies || 0), 0);
-            return {
-                id: ta.id,
-                classCode: ta.classCode,
-                createdAt: ta.createdAt,
-                subject: ta.subject,
-                term: ta.term,
-                reviewsCount: rootReviews + replies, // Sum of root + replies
-            };
-        }),
-    };
+  const response = {
+    ...lecturer,
+    myVote,
+    isBookmarked, // <--- Added
+    engagementScore,
+    teachingAssignments: lecturer.teachingAssignments.map((ta) => {
+      const rootReviews = ta._count.reviews;
+      const replies = ta.reviews.reduce(
+        (acc: number, curr) => acc + (curr._count?.replies || 0),
+        0,
+      );
+      return {
+        id: ta.id,
+        classCode: ta.classCode,
+        createdAt: ta.createdAt,
+        subject: ta.subject,
+        term: ta.term,
+        reviewsCount: rootReviews + replies, // Sum of root + replies
+      };
+    }),
+  };
 
-    sendSuccess(res, response, 'Lấy thông tin giảng viên thành công');
+  sendSuccess(res, response, 'Lấy thông tin giảng viên thành công');
 };
 
 // ========================================
@@ -305,124 +304,119 @@ export const getLecturerById = async (
  */
 import { AuthenticatedRequest } from '../types/auth.types';
 
-export const voteLecturer = async (
-    req: AuthenticatedRequest,
-    res: Response
-): Promise<void> => {
-    const { id: lecturerId } = req.params;
-    const { voteType } = req.body;
-    const userId = req.user?.userId; // Từ Auth Middleware (JWT payload)
+export const voteLecturer = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  const { id: lecturerId } = req.params;
+  const { voteType } = req.body;
+  const userId = req.user?.userId; // Từ Auth Middleware (JWT payload)
 
-    if (!userId) {
-        throw new AppError('Unauthorized', 401);
-    }
+  if (!userId) {
+    throw new AppError('Unauthorized', 401);
+  }
 
-    if (!['UPVOTE', 'DOWNVOTE'].includes(voteType)) {
-        throw new AppError('Vote type không hợp lệ', 400);
-    }
+  if (!['UPVOTE', 'DOWNVOTE'].includes(voteType)) {
+    throw new AppError('Vote type không hợp lệ', 400);
+  }
 
-    // 1. Check lecturer exist
-    const lecturer = await prisma.lecturer.findUnique({
-        where: { id: lecturerId as string },
-    });
+  // 1. Check lecturer exist
+  const lecturer = await prisma.lecturer.findUnique({
+    where: { id: lecturerId as string },
+  });
 
-    if (!lecturer) {
-        throw new AppError('Giảng viên không tồn tại', 404);
-    }
+  if (!lecturer) {
+    throw new AppError('Giảng viên không tồn tại', 404);
+  }
 
-    // 2. Check existing vote
-    const existingVote = await prisma.lecturerVote.findUnique({
-        where: {
-            userId_lecturerId: {
-                userId: userId as string,
-                lecturerId: lecturerId as string,
-            },
-        },
-    });
+  // 2. Check existing vote
+  const existingVote = await prisma.lecturerVote.findUnique({
+    where: {
+      userId_lecturerId: {
+        userId: userId as string,
+        lecturerId: lecturerId as string,
+      },
+    },
+  });
 
-    if (existingVote) {
-        if (existingVote.voteType === voteType) {
-            // Unvote (Toggle off)
-            await prisma.$transaction(async (tx) => {
-                await tx.lecturerVote.delete({
-                    where: { id: existingVote.id },
-                });
-                // Giảm count
-                await tx.lecturer.update({
-                    where: { id: lecturerId as string },
-                    data: {
-                        [voteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
-                            decrement: 1,
-                        },
-                    },
-                });
-                await prisma.lecturer.update({
-                    where: { id: lecturerId as string },
-                    data: {
-                        [voteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
-                            decrement: 1,
-                        },
-                    },
-                });
-            });
-
-            // Update engagement score (async, non-blocking)
-            updateLecturerEngagementScore(lecturerId as string).catch(console.error);
-
-            sendSuccess(res, { voted: false, voteType: null }, 'Đã hủy vote');
-        } else {
-            // Change vote (Up -> Down or Down -> Up)
-            await prisma.$transaction(async (tx) => {
-                await tx.lecturerVote.update({
-                    where: { id: existingVote.id },
-                    data: { voteType },
-                });
-                // Update counts
-                const oldVoteType = existingVote.voteType;
-                await tx.lecturer.update({
-                    where: { id: lecturerId as string },
-                    data: {
-                        [oldVoteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
-                            decrement: 1,
-                        },
-                        [voteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
-                            increment: 1,
-                        },
-                    },
-                });
-            });
-
-            // Update engagement score
-            updateLecturerEngagementScore(lecturerId as string).catch(console.error);
-
-            sendSuccess(res, { voted: true, voteType }, 'Đã thay đổi vote thành công');
-        }
-    } else {
-        // Vote mới
-        await prisma.$transaction(async (tx) => {
-            await tx.lecturerVote.create({
-                data: {
-                    userId: userId as string,
-                    lecturerId: lecturerId as string,
-                    voteType,
-                },
-            });
-            // Tăng count
-            await tx.lecturer.update({
-                where: { id: lecturerId as string },
-                data: {
-                    [voteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
-                        increment: 1,
-                    },
-                },
-            });
+  if (existingVote) {
+    if (existingVote.voteType === voteType) {
+      // Unvote (Toggle off)
+      await prisma.$transaction(async (tx) => {
+        await tx.lecturerVote.delete({
+          where: { id: existingVote.id },
         });
+        // Giảm count
+        await tx.lecturer.update({
+          where: { id: lecturerId as string },
+          data: {
+            [voteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
+              decrement: 1,
+            },
+          },
+        });
+        await prisma.lecturer.update({
+          where: { id: lecturerId as string },
+          data: {
+            [voteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
+              decrement: 1,
+            },
+          },
+        });
+      });
 
-        // Update engagement score
-        updateLecturerEngagementScore(lecturerId as string).catch(console.error);
+      // Update engagement score (async, non-blocking)
+      updateLecturerEngagementScore(lecturerId as string).catch(console.error);
 
-        sendSuccess(res, { voted: true, voteType }, 'Vote thành công');
+      sendSuccess(res, { voted: false, voteType: null }, 'Đã hủy vote');
+    } else {
+      // Change vote (Up -> Down or Down -> Up)
+      await prisma.$transaction(async (tx) => {
+        await tx.lecturerVote.update({
+          where: { id: existingVote.id },
+          data: { voteType },
+        });
+        // Update counts
+        const oldVoteType = existingVote.voteType;
+        await tx.lecturer.update({
+          where: { id: lecturerId as string },
+          data: {
+            [oldVoteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
+              decrement: 1,
+            },
+            [voteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
+              increment: 1,
+            },
+          },
+        });
+      });
+
+      // Update engagement score
+      updateLecturerEngagementScore(lecturerId as string).catch(console.error);
+
+      sendSuccess(res, { voted: true, voteType }, 'Đã thay đổi vote thành công');
     }
+  } else {
+    // Vote mới
+    await prisma.$transaction(async (tx) => {
+      await tx.lecturerVote.create({
+        data: {
+          userId: userId as string,
+          lecturerId: lecturerId as string,
+          voteType,
+        },
+      });
+      // Tăng count
+      await tx.lecturer.update({
+        where: { id: lecturerId as string },
+        data: {
+          [voteType === 'UPVOTE' ? 'upvoteCount' : 'downvoteCount']: {
+            increment: 1,
+          },
+        },
+      });
+    });
+
+    // Update engagement score
+    updateLecturerEngagementScore(lecturerId as string).catch(console.error);
+
+    sendSuccess(res, { voted: true, voteType }, 'Vote thành công');
+  }
 };
-
-

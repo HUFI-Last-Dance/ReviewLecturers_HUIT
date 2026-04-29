@@ -7,71 +7,71 @@
 type LogLevel = 'info' | 'warn' | 'error' | 'debug' | 'success';
 
 interface LogOptions {
-    level: LogLevel;
-    message: string;
-    data?: any;
+  level: LogLevel;
+  message: string;
+  data?: unknown;
 }
 
 class Logger {
-    private getTimestamp(): string {
-        return new Date().toISOString();
+  private getTimestamp(): string {
+    return new Date().toISOString();
+  }
+
+  private getColorCode(level: LogLevel): string {
+    const colors = {
+      info: '\x1b[36m', // Cyan
+      warn: '\x1b[33m', // Yellow
+      error: '\x1b[31m', // Red
+      debug: '\x1b[35m', // Magenta
+      success: '\x1b[32m', // Green
+    };
+    return colors[level] || '\x1b[0m';
+  }
+
+  private getEmoji(level: LogLevel): string {
+    const emojis = {
+      info: 'ℹ️',
+      warn: '⚠️',
+      error: '❌',
+      debug: '🔍',
+      success: '✅',
+    };
+    return emojis[level] || '•';
+  }
+
+  private log(options: LogOptions): void {
+    const { level, message, data } = options;
+    const timestamp = this.getTimestamp();
+    const colorCode = this.getColorCode(level);
+    const resetCode = '\x1b[0m';
+    const emoji = this.getEmoji(level);
+
+    // Format: [timestamp] EMOJI LEVEL: message
+    const logMessage = `${colorCode}[${timestamp}] ${emoji} ${level.toUpperCase()}: ${message}${resetCode}`;
+
+    console.log(logMessage);
+
+    // Nếu có data, log riêng
+    if (data !== undefined) {
+      console.log(`${colorCode}Data:${resetCode}`, data);
     }
+  }
 
-    private getColorCode(level: LogLevel): string {
-        const colors = {
-            info: '\x1b[36m',    // Cyan
-            warn: '\x1b[33m',    // Yellow
-            error: '\x1b[31m',   // Red
-            debug: '\x1b[35m',   // Magenta
-            success: '\x1b[32m', // Green
-        };
-        return colors[level] || '\x1b[0m';
-    }
+  public info(message: string, data?: unknown): void {
+    this.log({ level: 'info', message, data });
+  }
 
-    private getEmoji(level: LogLevel): string {
-        const emojis = {
-            info: 'ℹ️',
-            warn: '⚠️',
-            error: '❌',
-            debug: '🔍',
-            success: '✅',
-        };
-        return emojis[level] || '•';
-    }
+  public warn(message: string, data?: unknown): void {
+    this.log({ level: 'warn', message, data });
+  }
 
-    private log(options: LogOptions): void {
-        const { level, message, data } = options;
-        const timestamp = this.getTimestamp();
-        const colorCode = this.getColorCode(level);
-        const resetCode = '\x1b[0m';
-        const emoji = this.getEmoji(level);
+  public error(message: string, data?: unknown): void {
+    this.log({ level: 'error', message, data });
+  }
 
-        // Format: [timestamp] EMOJI LEVEL: message
-        const logMessage = `${colorCode}[${timestamp}] ${emoji} ${level.toUpperCase()}: ${message}${resetCode}`;
-
-        console.log(logMessage);
-
-        // Nếu có data, log riêng
-        if (data !== undefined) {
-            console.log(`${colorCode}Data:${resetCode}`, data);
-        }
-    }
-
-    public info(message: string, data?: any): void {
-        this.log({ level: 'info', message, data });
-    }
-
-    public warn(message: string, data?: any): void {
-        this.log({ level: 'warn', message, data });
-    }
-
-    public error(message: string, data?: any): void {
-        this.log({ level: 'error', message, data });
-    }
-
-    public success(message: string, data?: any): void {
-        this.log({ level: 'success', message, data });
-    }
+  public success(message: string, data?: unknown): void {
+    this.log({ level: 'success', message, data });
+  }
 }
 
 // Singleton instance

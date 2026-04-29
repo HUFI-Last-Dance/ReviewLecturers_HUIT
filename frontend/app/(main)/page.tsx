@@ -1,27 +1,29 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Star, MessagesSquare, CheckCircle, TrendingUp, Flame } from "lucide-react";
-import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { academicService } from "@/services/academic.service";
-import { reviewService } from "@/services/review.service";
-import { useLanguage } from "@/contexts/language-context";
+import { Button } from '@/components/ui/button';
+import { ArrowRight, Star, MessagesSquare, TrendingUp, Flame } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useQuery } from '@tanstack/react-query';
+import { academicService } from '@/services/academic.service';
+import { reviewService } from '@/services/review.service';
+import { useLanguage } from '@/contexts/language-context';
+import type { Lecturer, RecentReview } from '@/types/academic';
 
 export default function Home() {
   const { t } = useLanguage();
   const { data: lecturersData } = useQuery({
     queryKey: ['featured-lecturers'],
-    queryFn: () => academicService.getLecturers({ limit: 4, sort: 'engagement' })
+    queryFn: () => academicService.getLecturers({ limit: 4, sort: 'engagement' }),
   });
 
   const { data: reviewsData } = useQuery({
     queryKey: ['recent-reviews'],
-    queryFn: () => reviewService.getRecentReviews()
+    queryFn: () => reviewService.getRecentReviews(),
   });
 
-  const featuredLecturers = lecturersData?.data?.lecturers || [];
-  const recentReviews = reviewsData?.data || []; // getRecentReviews returns array directly in data
+  const featuredLecturers: Lecturer[] = lecturersData?.data?.lecturers || [];
+  const recentReviews: RecentReview[] = reviewsData?.data || [];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -34,10 +36,13 @@ export default function Home() {
         <div className="container mx-auto px-4 text-center">
           {/* Banner */}
           <div className="w-full max-w-5xl mx-auto mb-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800">
-            <img
+            <Image
               src="/huit-banner.png"
               alt="HUIT Banner"
+              width={1024}
+              height={280}
               className="w-full h-[200px] md:h-[280px] object-cover object-center"
+              priority
             />
           </div>
 
@@ -54,7 +59,11 @@ export default function Home() {
               </Button>
             </Link>
             <Link href="/about">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto text-lg px-8 py-6 rounded-[1.25rem] border-2 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800">
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto text-lg px-8 py-6 rounded-[1.25rem] border-2 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
                 Tìm hiểu thêm
               </Button>
             </Link>
@@ -87,16 +96,25 @@ export default function Home() {
                 <Star className="w-6 h-6 text-yellow-500 fill-current" />
                 {t('home.featured_lecturers')}
               </h2>
-              <p className="text-slate-600 dark:text-slate-400 mt-1">Giảng viên được đánh giá sôi nổi nhất</p>
+              <p className="text-slate-600 dark:text-slate-400 mt-1">
+                Giảng viên được đánh giá sôi nổi nhất
+              </p>
             </div>
-            <Link href="/lecturers" className="text-blue-700 dark:text-blue-400 font-semibold hover:underline flex items-center">
+            <Link
+              href="/lecturers"
+              className="text-blue-700 dark:text-blue-400 font-semibold hover:underline flex items-center"
+            >
               {t('home.view_all')} <ArrowRight className="w-4 h-4 ml-1" />
             </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredLecturers.map((lecturer: any) => (
-              <Link key={lecturer.id} href={`/lecturers/${lecturer.id}`} className="group relative block clay-card p-6 border-none hover:translate-y-[-4px] transition-all duration-300">
+            {featuredLecturers.map((lecturer) => (
+              <Link
+                key={lecturer.id}
+                href={`/lecturers/${lecturer.id}`}
+                className="group relative block clay-card p-6 border-none hover:translate-y-[-4px] transition-all duration-300"
+              >
                 <div className="absolute top-4 right-4 z-10 text-slate-300 dark:text-slate-600 group-hover:text-primary transition-colors">
                   <Star className="w-6 h-6" />
                 </div>
@@ -110,14 +128,19 @@ export default function Home() {
                   {lecturer.department}
                 </p>
                 <div className="flex items-center gap-2 text-xs font-semibold">
-
                   <div className="relative group/tooltip">
-                    <span className={`px-2 py-1 rounded-lg border flex items-center gap-1 cursor-help ${lecturer.engagementScore && lecturer.engagementScore > 50 ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800' : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'}`}>
-                      <Flame className={`w-3 h-3 text-orange-500 ${(lecturer.engagementScore && lecturer.engagementScore > 50) ? 'animate-pulse' : ''}`} />
+                    <span
+                      className={`px-2 py-1 rounded-lg border flex items-center gap-1 cursor-help ${lecturer.engagementScore && lecturer.engagementScore > 50 ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800' : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'}`}
+                    >
+                      <Flame
+                        className={`w-3 h-3 text-orange-500 ${lecturer.engagementScore && lecturer.engagementScore > 50 ? 'animate-pulse' : ''}`}
+                      />
                       {lecturer.engagementScore || 0}
                     </span>
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-900 text-white text-[10px] rounded-lg opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 shadow-xl z-50 pointer-events-none text-center">
-                      <p className="font-bold mb-0.5 text-orange-400">🔥 {t('lecturers.hot_tooltip').split(':')[0]}</p>
+                      <p className="font-bold mb-0.5 text-orange-400">
+                        🔥 {t('lecturers.hot_tooltip').split(':')[0]}
+                      </p>
                       {t('lecturers.hot_tooltip').split(':')[1]}
                       <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45"></div>
                     </div>
@@ -133,9 +156,14 @@ export default function Home() {
                 </div>
               </Link>
             ))}
-            {featuredLecturers.length === 0 && [1, 2, 3, 4].map(i => (
-              <div key={i} className="h-48 bg-slate-100 dark:bg-slate-800 rounded-2xl animate-pulse border border-slate-200 dark:border-slate-700" />
-            ))}
+            {featuredLecturers.length === 0
+              ? [1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="h-48 bg-slate-100 dark:bg-slate-800 rounded-2xl animate-pulse border border-slate-200 dark:border-slate-700"
+                  />
+                ))
+              : null}
           </div>
         </div>
       </section>
@@ -148,12 +176,17 @@ export default function Home() {
               <MessagesSquare className="w-6 h-6 text-indigo-500" />
               {t('home.recent_reviews')}
             </h2>
-            <p className="text-slate-600 dark:text-slate-400 mt-2">Những nhận xét mới nhất từ sinh viên HUIT</p>
+            <p className="text-slate-600 dark:text-slate-400 mt-2">
+              Những nhận xét mới nhất từ sinh viên HUIT
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recentReviews.map((review: any) => (
-              <div key={review.id} className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-lg border border-slate-300 dark:border-slate-800 hover:shadow-2xl hover:border-indigo-400 transition-all duration-300">
+            {recentReviews.map((review) => (
+              <div
+                key={review.id}
+                className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-lg border border-slate-300 dark:border-slate-800 hover:shadow-2xl hover:border-indigo-400 transition-all duration-300"
+              >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm border-2 border-white dark:border-slate-800 shadow-sm">
@@ -175,19 +208,20 @@ export default function Home() {
                     href={`/assignments/${review.teachingAssignmentId}#review-${review.id}`}
                     className="text-xs font-semibold text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors inline-block mb-2"
                   >
-                    {review.teachingAssignment.subject.name} - {review.teachingAssignment.lecturer.fullName}
+                    {review.teachingAssignment.subject.name} -{' '}
+                    {review.teachingAssignment.lecturer.fullName}
                   </Link>
-                  <Link href={`/assignments/${review.teachingAssignmentId}#review-${review.id}`} className="block group">
-
+                  <Link
+                    href={`/assignments/${review.teachingAssignmentId}#review-${review.id}`}
+                    className="block group"
+                  >
                     <p className="text-slate-700 dark:text-slate-300 text-xs line-clamp-3 leading-relaxed group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors">
                       ({review.teachingAssignment.term.name})
                     </p>
                     <p className="text-slate-700 dark:text-slate-300 text-base line-clamp-3 leading-relaxed group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors">
                       {review.content}
                     </p>
-
                   </Link>
-
                 </div>
 
                 <div className="flex items-center justify-between pt-4 border-t-2 border-slate-100 dark:border-slate-800">
@@ -198,9 +232,14 @@ export default function Home() {
                 </div>
               </div>
             ))}
-            {recentReviews.length === 0 && [1, 2, 3].map(i => (
-              <div key={i} className="h-40 bg-white dark:bg-slate-900 rounded-2xl animate-pulse border-2 border-slate-200 dark:border-slate-800" />
-            ))}
+            {recentReviews.length === 0
+              ? [1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-40 bg-white dark:bg-slate-900 rounded-2xl animate-pulse border-2 border-slate-200 dark:border-slate-800"
+                  />
+                ))
+              : null}
           </div>
         </div>
       </section>
@@ -213,13 +252,19 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 text-center lg:text-left text-white">
-              <h2 className="text-3xl md:text-4xl font-black mb-6">Trải nghiệm tốt hơn trên ứng dụng di động</h2>
+              <h2 className="text-3xl md:text-4xl font-black mb-6">
+                Trải nghiệm tốt hơn trên ứng dụng di động
+              </h2>
               <p className="text-blue-100 text-lg mb-10 max-w-xl">
-                Theo dõi giảng viên, nhận thông báo review mới và thảo luận cùng cộng đồng sinh viên HUIT ngay trên điện thoại của bạn.
+                Theo dõi giảng viên, nhận thông báo review mới và thảo luận cùng cộng đồng sinh viên
+                HUIT ngay trên điện thoại của bạn.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                 <Link href="/download/android" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto bg-black hover:bg-slate-900 text-white border-none px-8 py-7 rounded-2xl flex items-center gap-3">
+                  <Button
+                    size="lg"
+                    className="w-full sm:w-auto bg-black hover:bg-slate-900 text-white border-none px-8 py-7 rounded-2xl flex items-center gap-3"
+                  >
                     <div className="text-left">
                       <div className="text-[10px] uppercase font-bold opacity-70">Tải về cho</div>
                       <div className="text-lg font-bold">Android (APK)</div>
@@ -227,7 +272,10 @@ export default function Home() {
                   </Button>
                 </Link>
                 <Link href="/download/ios" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto bg-black hover:bg-slate-900 text-white border-none px-8 py-7 rounded-2xl flex items-center gap-3">
+                  <Button
+                    size="lg"
+                    className="w-full sm:w-auto bg-black hover:bg-slate-900 text-white border-none px-8 py-7 rounded-2xl flex items-center gap-3"
+                  >
                     <div className="text-left">
                       <div className="text-[10px] uppercase font-bold opacity-70">Tải về trên</div>
                       <div className="text-lg font-bold">App Store</div>
@@ -239,12 +287,15 @@ export default function Home() {
             <div className="flex-1 relative">
               <div className="relative mx-auto w-[280px] h-[580px] bg-slate-800 rounded-[3rem] border-[8px] border-slate-900 shadow-2xl overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-900 rounded-b-2xl z-20" />
-                <img
+                <Image
                   src="/mobile-preview.png"
                   alt="App Preview"
+                  width={280}
+                  height={580}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=280&h=580';
+                    (e.target as HTMLImageElement).src =
+                      'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=280&h=580';
                   }}
                 />
               </div>
@@ -255,6 +306,5 @@ export default function Home() {
         </div>
       </section>
     </div>
-
   );
 }
