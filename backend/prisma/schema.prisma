@@ -9,15 +9,16 @@ datasource db {
 
 /// Bảng lưu thông tin tất cả người dùng (sinh viên, giảng viên, admin)
 model User {
-  id               String         @id @default(uuid()) @db.Uuid
-  email            String         @unique @db.VarChar(255)
-  password         String         @db.VarChar(255)
-  fullName         String         @map("full_name") @db.VarChar(255)
-  studentId        String?        @map("student_id") @db.VarChar(50)
-  createdAt        DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt        DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
-  profileUpdatedAt DateTime?      @map("profile_updated_at") @db.Timestamptz(3)
+  id               String             @id @default(uuid()) @db.Uuid
+  email            String             @unique @db.VarChar(255)
+  password         String             @db.VarChar(255)
+  fullName         String             @map("full_name") @db.VarChar(255)
+  studentId        String?            @map("student_id") @db.VarChar(50)
+  createdAt        DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+  profileUpdatedAt DateTime?          @map("profile_updated_at") @db.Timestamptz(3)
   accessLogs       AccessLog[]
+  bookmarks        LecturerBookmark[]
   lecturerVotes    LecturerVote[]
   lecturer         Lecturer?
   replyVotes       ReplyVote[]
@@ -25,7 +26,6 @@ model User {
   reviewVotes      ReviewVote[]
   reviews          Review[]
   userRoles        UserRole[]
-  bookmarks        LecturerBookmark[]
 
   @@map("users")
 }
@@ -54,10 +54,6 @@ model UserRole {
   @@map("user_roles")
 }
 
-// ========================================
-// 👨‍🏫 BẢNG DỮ LIỆU HỌC THUẬT
-// ========================================
-
 /// Bảng lưu danh sách học vị (ThS, TS, PGS, GS, ...)
 model AcademicDegree {
   id        String     @id @default(uuid()) @db.Uuid
@@ -84,10 +80,10 @@ model Lecturer {
   upvoteCount         Int                  @default(0) @map("upvote_count")
   cleanName           String?              @map("clean_name") @db.VarChar(255)
   engagementScore     Int                  @default(0) @map("engagement_score")
-  totalReviews        Int                  @default(0) @map("total_reviews") // Cached count of reviews (root + replies)
-  totalReviewVotes    Int                  @default(0) @map("total_review_votes") // Cached sum of review votes
-  votes               LecturerVote[]
+  totalReviewVotes    Int                  @default(0) @map("total_review_votes")
+  totalReviews        Int                  @default(0) @map("total_reviews")
   bookmarks           LecturerBookmark[]
+  votes               LecturerVote[]
   degree              AcademicDegree?      @relation(fields: [degreeId], references: [id])
   user                User?                @relation(fields: [userId], references: [id])
   teachingAssignments TeachingAssignment[]
@@ -257,20 +253,20 @@ model AccessLog {
   @@map("access_logs")
 }
 
-enum VoteType {
-  UPVOTE
-  DOWNVOTE
-}
-
 /// Bảng lưu bookmark giảng viên (yêu thích/theo dõi)
 model LecturerBookmark {
   id         String   @id @default(uuid()) @db.Uuid
   userId     String   @map("user_id") @db.Uuid
   lecturerId String   @map("lecturer_id") @db.Uuid
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   lecturer   Lecturer @relation(fields: [lecturerId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, lecturerId]) // Một user chỉ bookmark 1 lecturer 1 lần
+  @@unique([userId, lecturerId])
   @@map("lecturer_bookmarks")
+}
+
+enum VoteType {
+  UPVOTE
+  DOWNVOTE
 }
