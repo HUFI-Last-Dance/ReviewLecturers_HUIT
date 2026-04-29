@@ -1,0 +1,75 @@
+# Dependencies
+node_modules
+.pnpm-store
+.code-review-graph
+# Testing
+coverage
+.*
+!.husky/
+!.github/
+# Next.js
+.next/
+out/
+
+.cursorrules
+.windsurfrules
+.kiro/steering/code-review-graph.md
+.claude/skills
+.claude/settings.json
+.git/hooks/pre-commit
+
+
+# Production
+build
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local Env Files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# Vercel
+.vercel
+
+# Prisma
+/backend/prisma/migrations
+
+# Agent & AI configs
+.agent/
+.codex/
+.gemini/
+.claude/
+.cursor/
+.cursorrules
+.windsurf/
+.windsurfrules
+.roo/
+.trae/
+.continue/
+.kiro/
+.qoder/
+.opencode/
+.codebuddy/
+.mcp.json
+.opencode.json
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
