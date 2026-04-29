@@ -7,6 +7,9 @@ coverage
 .*
 !.husky/
 !.github/
+!backend/.eslintrc.json
+!backend/.eslintignore
+!mobile/.eslintrc.json
 # Next.js
 .next/
 out/
@@ -46,11 +49,11 @@ yarn-error.log*
 /backend/prisma/migrations
 
 # Agent & AI configs
-.agent/
-.codex/
-.gemini/
-.claude/
-.cursor/
+!.agent/
+!.codex/
+!.gemini/
+!.claude/
+!.cursor/
 .cursorrules
 .windsurf/
 .windsurfrules

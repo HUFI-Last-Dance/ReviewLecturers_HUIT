@@ -58,39 +58,48 @@ export default function HomeScreen() {
   }, []);
 
   const goToComparison = () => {
-    router.push('/comparison' as any);
+    router.push('/comparison' as Parameters<typeof router.push>[0]);
   };
 
-  const renderItem = useCallback(({ item }: { item: Lecturer }) => (
-    <LecturerCard lecturer={item} />
-  ), []);
+  const renderItem = useCallback(
+    ({ item }: { item: Lecturer }) => <LecturerCard lecturer={item} />,
+    [],
+  );
 
-  const renderHeader = () => (
-    <View style={styles.header}>
-      {/* Search Bar */}
-      <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <Search size={20} color={colors.textSecondary} />
-        <TextInput
-          style={[styles.searchInput, { color: colors.text }]}
-          placeholder="Tìm kiếm giảng viên..."
-          placeholderTextColor={colors.textMuted}
-          value={searchQuery}
-          onChangeText={handleSearch}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-        <TouchableOpacity style={styles.filterButton}>
-          <SlidersHorizontal size={20} color={colors.textSecondary} />
-        </TouchableOpacity>
+  const renderHeader = useCallback(
+    () => (
+      <View style={styles.header}>
+        {/* Search Bar */}
+        <View
+          style={[
+            styles.searchContainer,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+        >
+          <Search size={20} color={colors.textSecondary} />
+          <TextInput
+            style={[styles.searchInput, { color: colors.text }]}
+            placeholder="Tìm kiếm giảng viên..."
+            placeholderTextColor={colors.textMuted}
+            value={searchQuery}
+            onChangeText={handleSearch}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          <TouchableOpacity style={styles.filterButton}>
+            <SlidersHorizontal size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Stats */}
+        {pagination && (
+          <Text style={[styles.resultCount, { color: colors.textSecondary }]}>
+            Tìm thấy {pagination.total} giảng viên
+          </Text>
+        )}
       </View>
-
-      {/* Stats */}
-      {pagination && (
-        <Text style={[styles.resultCount, { color: colors.textSecondary }]}>
-          Tìm thấy {pagination.total} giảng viên
-        </Text>
-      )}
-    </View>
+    ),
+    [colors, searchQuery, handleSearch, pagination],
   );
 
   const renderFooter = () => {
@@ -133,13 +142,14 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      edges={['top']}
+    >
       {/* Title */}
       <View style={styles.titleContainer}>
         <Text style={[styles.title, { color: colors.text }]}>Giảng viên</Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          ReviewLecturers
-        </Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>ReviewLecturers</Text>
       </View>
 
       <FlatList
@@ -161,10 +171,11 @@ export default function HomeScreen() {
         }
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
+        extraData={selectedLecturers}
       />
 
       {/* Comparison FAB */}
-      {selectedLecturers.length > 0 && (
+      {canCompare && (
         <TouchableOpacity
           style={[styles.fab, { backgroundColor: colors.primary }]}
           onPress={goToComparison}
@@ -273,4 +284,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-

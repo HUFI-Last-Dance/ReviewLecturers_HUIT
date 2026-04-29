@@ -11,16 +11,18 @@ import { PrismaClient } from '@prisma/client';
 
 // Extend PrismaClient nếu cần (soft delete, custom methods, etc)
 const prismaClientSingleton = () => {
-    return new PrismaClient({
-        log: process.env.NODE_ENV === 'development'
-            ? ['query', 'error', 'warn'] // Hiển thị queries trong dev
-            : ['error'], // Chỉ hiển thị errors trong production
-    });
+  return new PrismaClient({
+    log:
+      process.env.NODE_ENV === 'development'
+        ? ['query', 'error', 'warn'] // Hiển thị queries trong dev
+        : ['error'], // Chỉ hiển thị errors trong production
+  });
 };
 
 // Declare global type cho TypeScript
 declare global {
-    var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>;
+  // eslint-disable-next-line no-var
+  var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>;
 }
 
 // Sử dụng global variable để tránh tạo instance mới khi hot reload
@@ -30,7 +32,7 @@ export default prisma;
 
 // Trong development, lưu vào global để hot reload không tạo instance mới
 if (process.env.NODE_ENV !== 'production') {
-    globalThis.prismaGlobal = prisma;
+  globalThis.prismaGlobal = prisma;
 }
 
 // ========================================
