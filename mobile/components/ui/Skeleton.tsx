@@ -69,24 +69,6 @@ export function LecturerCardSkeleton() {
   );
 }
 
-// Skeleton cho Review Card
-export function ReviewCardSkeleton() {
-  return (
-    <View style={styles.reviewCard}>
-      <View style={styles.reviewHeader}>
-        <Skeleton width={32} height={32} borderRadius={16} />
-        <View style={{ flex: 1, marginLeft: 12 }}>
-          <Skeleton width="50%" height={16} />
-          <Skeleton width="30%" height={12} style={{ marginTop: 4 }} />
-        </View>
-      </View>
-      <Skeleton width="100%" height={14} style={{ marginTop: 12 }} />
-      <Skeleton width="90%" height={14} style={{ marginTop: 4 }} />
-      <Skeleton width="70%" height={14} style={{ marginTop: 4 }} />
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   lecturerCard: {
     flexDirection: 'row',
@@ -96,12 +78,5 @@ const styles = StyleSheet.create({
   lecturerInfo: {
     flex: 1,
     marginLeft: 12,
-  },
-  reviewCard: {
-    padding: 16,
-  },
-  reviewHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
 });
