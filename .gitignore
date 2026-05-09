@@ -22,7 +22,7 @@ coverage
 data
 # Production
 build
-
+REPORT/
 # Misc
 .DS_Store
 *.pem

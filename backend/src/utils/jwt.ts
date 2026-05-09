@@ -37,18 +37,6 @@ export const verifyToken = (token: string): JwtPayload => {
   }
 };
 
-/**
- * Decode JWT Token (không verify, chỉ decode)
- * Dùng để debug hoặc lấy thông tin khi không cần verify
- */
-export const decodeToken = (token: string): JwtPayload | null => {
-  try {
-    return jwt.decode(token) as JwtPayload;
-  } catch {
-    return null;
-  }
-};
-
 // ========================================
 // 📝 CÁCH SỬ DỤNG
 // ========================================
