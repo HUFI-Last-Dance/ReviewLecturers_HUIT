@@ -11,17 +11,19 @@ dotenv.config();
 
 // Initialize Express app
 const app: Application = express();
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT) || 5000;
 
 // ========================================
 // 🔧 MIDDLEWARE
 // ========================================
 
 // CORS - cho phép frontend gọi API
-app.use(cors({
+app.use(
+  cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
-}));
+  }),
+);
 
 // Parse JSON body
 app.use(express.json());
@@ -37,18 +39,22 @@ app.use(requestLogger);
 // ========================================
 
 app.get('/', (req, res) => {
-    sendSuccess(res, {
-        version: '1.0.0',
-        timestamp: new Date().toISOString(),
-    }, '🚀 ReviewLecturers API is running!');
+  sendSuccess(
+    res,
+    {
+      version: '1.0.0',
+      timestamp: new Date().toISOString(),
+    },
+    '🚀 ReviewLecturers API is running!',
+  );
 });
 
 app.get('/health', (req, res) => {
-    sendSuccess(res, {
-        status: 'healthy',
-        database: 'connected',
-        uptime: process.uptime(),
-    });
+  sendSuccess(res, {
+    status: 'healthy',
+    database: 'connected',
+    uptime: process.uptime(),
+  });
 });
 
 // ========================================
@@ -91,15 +97,20 @@ app.use(errorHandler);
 // ========================================
 
 if (require.main === module) {
-    app.listen(PORT, () => {
-        console.log('========================================');
-        logger.success('ReviewLecturers Backend Server Started');
-        console.log('========================================');
-        logger.info(`Server running on: http://localhost:${PORT}`);
-        logger.info(`Database: ${process.env.DATABASE_URL?.split('@')[1]?.split('/')[0] || 'Neon PostgreSQL'}`);
-        logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-        console.log('========================================');
-    });
+  const HOST = process.env.HOST || '0.0.0.0';
+
+  app.listen(PORT, HOST, () => {
+    console.log('========================================');
+    logger.success('ReviewLecturers Backend Server Started');
+    console.log('========================================');
+    logger.info(`Server running on: http://localhost:${PORT}`);
+    logger.info(`Network access: http://<your-lan-ip>:${PORT}`);
+    logger.info(
+      `Database: ${process.env.DATABASE_URL?.split('@')[1]?.split('/')[0] || 'Neon PostgreSQL'}`,
+    );
+    logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log('========================================');
+  });
 }
 
 export default app;

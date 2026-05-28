@@ -1,4 +1,22 @@
+# CLAUDE Quick Rules
+
+- Graph-first: `code-review-graph` -> `semantic_search` -> targeted reads -> `rg` -> `grep`.
+- Read minimal callers-only snippets; avoid full-file reads.
+- Prefer MCP tools; avoid multi-agent/verbose prompts.
+- Ignore: node_modules, dist, build, .next, vendor, binary assets, large media.
+- Keep prompts imperative, token-light, and link to `docs/` for details.
 <!-- code-review-graph MCP tools -->
+
+# Project Rules
+
+- never scan node_modules
+- never scan dist
+- use context7 first
+- prefer rg over grep
+- ask before large refactor
+- keep edits minimal
+- prefer existing architecture
+
 ## MCP Tools: code-review-graph
 
 **IMPORTANT: This project has a knowledge graph. ALWAYS use the

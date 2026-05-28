@@ -1,3 +1,42 @@
+# Node
+node_modules/
+
+# Builds
+dist/
+build/
+.next/
+
+# Coverage
+coverage/
+
+# Cache
+.cache/
+tmp/
+logs/
+*.log
+
+# Vendor/binaries/media
+vendor/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+*.mov
+!/mobile/assets/
+!/mobile/assets/images/
+!/mobile/assets/images/*.png
+
+# Generated
+*.lock
+*.min.js
+*.bundle.js
+
+# AI/tooling
+.ai-cache/
+.claude/cache/
+.cache-ai/
+/.prompts/
 # Dependencies
 node_modules
 .pnpm-store
@@ -27,6 +66,9 @@ REPORT/
 .DS_Store
 *.pem
 
+# Standalone mobile repository nested locally
+/mobile-standalone/
+
 # Debug
 npm-debug.log*
 yarn-debug.log*
@@ -45,6 +87,11 @@ yarn-error.log*
 
 # Prisma
 /backend/prisma/migrations
+
+# Expo assets required by EAS Build
+!/mobile/assets/
+!/mobile/assets/images/
+!/mobile/assets/images/*.png
 
 # Agent & AI configs
 !.agent/
@@ -74,3 +121,5 @@ GEMINI.md
 *.swp
 *.swo
 
+CLAUDE.md
+docs/
